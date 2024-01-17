@@ -1,7 +1,7 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * Represents a single chess piece
@@ -64,13 +64,13 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        HashSet<ChessMove> moves = new HashSet<>();
 
         return moves;
     }
 
     private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        HashSet<ChessMove> moves = new HashSet<>();
         int row = myPosition.getRow();
         int column = myPosition.getColumn();
         boolean forward = (row < 8);
@@ -121,7 +121,7 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        HashSet<ChessMove> moves = new HashSet<>();
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         //Forward 2
@@ -196,19 +196,62 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        HashSet<ChessMove> moves = new HashSet<>();
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        PieceType [] promotions = {PieceType.BISHOP, PieceType.KNIGHT, PieceType.ROOK, PieceType.QUEEN};
+        boolean firstMove = (row == 7 && board.getPiece(myPosition).color == ChessGame.TeamColor.BLACK) ||
+                (row == 2 && board.getPiece(myPosition).color == ChessGame.TeamColor.WHITE);
+        boolean madeIt = (row - 1 == 1 && board.getPiece(myPosition).color == ChessGame.TeamColor.BLACK) ||
+                (row + 1 == 8 && board.getPiece(myPosition).color == ChessGame.TeamColor.WHITE);
+        int direction = board.getPiece(myPosition).color == ChessGame.TeamColor.BLACK ? -1 : 1;
+        if (board.getPiece(new ChessPosition(row + direction, col)) == null){
+            if (madeIt) {
+                for (PieceType type : promotions) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(row + direction, col), type));
+                }
+            }
+            else {
+                moves.add(new ChessMove(myPosition,new ChessPosition(row + direction, col), null));
+            }
+            if(firstMove && (board.getPiece(new ChessPosition(row + (direction * 2), col)) == null)){
+                moves.add(new ChessMove(myPosition,new ChessPosition(row + (direction * 2), col), null));
+            }
+        }
+        if (board.getPiece(new ChessPosition(row + direction, col + 1)) != null &&
+                board.getPiece(new ChessPosition(row + direction, col + 1)).color != myColor){
+            if (madeIt) {
+                for (PieceType type : promotions) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(row + direction, col + 1), type));
+                }
+            }
+            else {
+                moves.add(new ChessMove(myPosition,new ChessPosition(row + direction, col + 1), null));
+            }
+        }
+        if (board.getPiece(new ChessPosition(row + direction, col - 1)) != null &&
+                board.getPiece(new ChessPosition(row + direction, col - 1)).color != myColor){
+            if (madeIt) {
+                for (PieceType type : promotions) {
+                        moves.add(new ChessMove(myPosition, new ChessPosition(row + direction, col - 1), type));
+                }
+            }
+            else {
+                moves.add(new ChessMove(myPosition,new ChessPosition(row + direction, col - 1), null));
+            }
+        }
 
         return moves;
     }
 
     private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        HashSet<ChessMove> moves = new HashSet<>();
 
         return moves;
     }
 
     private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
-        ArrayList<ChessMove> moves = new ArrayList<>();
+        HashSet<ChessMove> moves = new HashSet<>();
 
         return moves;
     }
