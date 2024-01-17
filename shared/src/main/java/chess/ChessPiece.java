@@ -52,37 +52,98 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        ChessGame.TeamColor myColor = board.getPiece(myPosition).color;
         return switch (pieceType) {
-            case KING -> kingMoves(board);
-            case QUEEN -> queenMoves(board);
-            case BISHOP -> bishopMoves(board);
-            case KNIGHT -> knightMoves(board);
-            case ROOK -> rookMoves(board);
-            case PAWN -> pawnMoves(board);
+            case KING -> kingMoves(board, myPosition, myColor);
+            case QUEEN -> queenMoves(board, myPosition, myColor);
+            case BISHOP -> bishopMoves(board, myPosition, myColor);
+            case KNIGHT -> knightMoves(board, myPosition, myColor);
+            case ROOK -> rookMoves(board, myPosition, myColor);
+            case PAWN -> pawnMoves(board, myPosition, myColor);
         };
-
     }
 
-    private Collection<ChessMove> bishopMoves(ChessBoard board) {
-        return new ArrayList<>();
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+        return moves;
     }
 
-    private Collection<ChessMove> kingMoves(ChessBoard board) {
-        return new ArrayList<>();
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+        int row = myPosition.getRow();
+        int column = myPosition.getColumn();
+        boolean forward = (row < 8);
+        boolean back = (row > 1);
+        boolean left = (column > 1);
+        boolean right = (column < 8);
+        //Forward
+        if (forward && (board.getPiece(new ChessPosition(row + 1, column)) == null ||
+                board.getPiece(new ChessPosition(row + 1, column)).color != myColor)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column),null));
+        }
+        //Back
+        if (back && (board.getPiece(new ChessPosition(row - 1, column)) == null ||
+                board.getPiece(new ChessPosition(row - 1, column)).color != myColor)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column),null));
+        }
+        //Left
+        if (left && (board.getPiece(new ChessPosition(row, column - 1)) == null ||
+                board.getPiece(new ChessPosition(row, column - 1)).color != myColor)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row, column - 1),null));
+        }
+        //Right
+        if (right && (board.getPiece(new ChessPosition(row, column + 1)) == null ||
+                board.getPiece(new ChessPosition(row, column + 1)).color != myColor)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row, column + 1),null));
+        }
+        //Forward-Left
+        if ((forward && left) && (board.getPiece(new ChessPosition(row + 1, column - 1)) == null ||
+                board.getPiece(new ChessPosition(row + 1, column - 1)).color != myColor)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column - 1),null));
+        }
+        //Forward-Right
+        if ((forward && right) && (board.getPiece(new ChessPosition(row + 1, column + 1)) == null ||
+                board.getPiece(new ChessPosition(row + 1, column + 1)).color != myColor)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row + 1, column + 1),null));
+        }
+        //Back-Left
+        if ((back && left) && (board.getPiece(new ChessPosition(row - 1, column - 1)) == null ||
+                board.getPiece(new ChessPosition(row - 1, column - 1)).color != myColor)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column - 1),null));
+        }
+        //Back-Right
+        if ((back && right) && (board.getPiece(new ChessPosition(row - 1, column + 1)) == null ||
+                board.getPiece(new ChessPosition(row - 1, column + 1)).color != myColor)) {
+            moves.add(new ChessMove(myPosition, new ChessPosition(row - 1, column + 1),null));
+        }
+        return moves;
     }
 
-    private Collection<ChessMove> knightMoves(ChessBoard board) {
-        return new ArrayList<>();
+    private Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+        return moves;
     }
-    private Collection<ChessMove> pawnMoves(ChessBoard board) {
-        return new ArrayList<>();
+
+    private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+        return moves;
     }
-    private Collection<ChessMove> queenMoves(ChessBoard board) {
-        return new ArrayList<>();
+
+    private Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+        return moves;
     }
-    private Collection<ChessMove> rookMoves(ChessBoard board) {
-        return new ArrayList<>();
+
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+        ArrayList<ChessMove> moves = new ArrayList<>();
+
+        return moves;
     }
+
 
     @Override
     public boolean equals(Object o) {
