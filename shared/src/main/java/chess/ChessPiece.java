@@ -63,9 +63,44 @@ public class ChessPiece {
         };
     }
 
-    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
         HashSet<ChessMove> moves = new HashSet<>();
-
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        boolean up = row < 8;
+        boolean down = row > 1;
+        boolean right = col < 8;
+        boolean left = col > 1;
+        for (int i = 1; i < 8; i++){
+            if (up){
+                if (board.getPiece(new ChessPosition(row + i, col)) == null ||
+                        board.getPiece(new ChessPosition(row + i, col)).color != myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row + i, col), null));
+                }
+                up = row + i < 8 && board.getPiece(new ChessPosition(row + i, col)) == null;
+            }
+            if (down){
+                if (board.getPiece(new ChessPosition(row - i, col)) == null ||
+                        board.getPiece(new ChessPosition(row - i, col)).color != myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row - i, col), null));
+                }
+                down = row - i > 1 && board.getPiece(new ChessPosition(row - i, col)) == null;
+            }
+            if (right){
+                if (board.getPiece(new ChessPosition(row, col + i)) == null ||
+                        board.getPiece(new ChessPosition(row, col + i)).color != myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row, col + i), null));
+                }
+                right = col + i < 8 && board.getPiece(new ChessPosition(row, col + i)) == null;
+            }
+            if (left){
+                if (board.getPiece(new ChessPosition(row, col - i)) == null ||
+                        board.getPiece(new ChessPosition(row, col - i)).color != myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row, col - i), null));
+                }
+                left = col - i > 1 && board.getPiece(new ChessPosition(row, col - i)) == null;
+            }
+        }
         return moves;
     }
 
@@ -250,7 +285,7 @@ public class ChessPiece {
         return moves;
     }
 
-    private Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
+    private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
         HashSet<ChessMove> moves = new HashSet<>();
 
         return moves;
