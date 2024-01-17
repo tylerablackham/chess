@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -12,7 +13,7 @@ public class ChessPiece {
     private PieceType pieceType;
     private ChessGame.TeamColor color;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         pieceType = type;
         color = pieceColor;
     }
@@ -51,7 +52,36 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        return switch (pieceType) {
+            case KING -> kingMoves(board);
+            case QUEEN -> queenMoves(board);
+            case BISHOP -> bishopMoves(board);
+            case KNIGHT -> knightMoves(board);
+            case ROOK -> rookMoves(board);
+            case PAWN -> pawnMoves(board);
+        };
+
+    }
+
+    private Collection<ChessMove> bishopMoves(ChessBoard board) {
+        return new ArrayList<>();
+    }
+
+    private Collection<ChessMove> kingMoves(ChessBoard board) {
+        return new ArrayList<>();
+    }
+
+    private Collection<ChessMove> knightMoves(ChessBoard board) {
+        return new ArrayList<>();
+    }
+    private Collection<ChessMove> pawnMoves(ChessBoard board) {
+        return new ArrayList<>();
+    }
+    private Collection<ChessMove> queenMoves(ChessBoard board) {
+        return new ArrayList<>();
+    }
+    private Collection<ChessMove> rookMoves(ChessBoard board) {
+        return new ArrayList<>();
     }
 
     @Override
