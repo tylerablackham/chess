@@ -287,7 +287,42 @@ public class ChessPiece {
 
     private Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
         HashSet<ChessMove> moves = new HashSet<>();
-
+        int row = myPosition.getRow();
+        int col = myPosition.getColumn();
+        boolean upLeft = (row < 8 && col > 1);
+        boolean upRight = (row < 8 && col < 8);
+        boolean downLeft = (row > 1 && col > 1);
+        boolean downRight = (row > 1 && col < 8);
+        for (int i = 1; i < 8; i++){
+            if (upLeft) {
+                if (board.getPiece(new ChessPosition(row + i, col - i)) == null ||
+                        board.getPiece(new ChessPosition(row + i, col - i)).color != myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row + i, col - i), null));
+                }
+                upLeft = row + i < 8 && col - i > 1 && board.getPiece(new ChessPosition(row + i, col - i)) == null;
+            }
+            if (upRight) {
+                if (board.getPiece(new ChessPosition(row + i, col + i)) == null ||
+                        board.getPiece(new ChessPosition(row + i, col + i)).color != myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row + i, col + i), null));
+                }
+                upRight = row + i < 8 && col + i < 8 && board.getPiece(new ChessPosition(row + i, col + i)) == null;
+            }
+            if (downLeft) {
+                if (board.getPiece(new ChessPosition(row - i, col - i)) == null ||
+                        board.getPiece(new ChessPosition(row - i, col - i)).color != myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row - i, col - i), null));
+                }
+                downLeft = row - i > 1 && col - i > 1 && board.getPiece(new ChessPosition(row - i, col - i)) == null;
+            }
+            if (downRight) {
+                if (board.getPiece(new ChessPosition(row - i, col + i)) == null ||
+                        board.getPiece(new ChessPosition(row - i, col + i)).color != myColor){
+                    moves.add(new ChessMove(myPosition, new ChessPosition(row - i, col + i), null));
+                }
+                downRight = row - i > 1 && col + i < 8 && board.getPiece(new ChessPosition(row - i, col + i)) == null;
+            }
+        }
         return moves;
     }
 
