@@ -12,7 +12,6 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor turn;
-    private ChessMove reverseLastMove;
 
     public ChessGame() {
         board = new ChessBoard();
@@ -66,7 +65,6 @@ public class ChessGame {
     }
 
     private void fakeMove(ChessMove move){
-        reverseLastMove = new ChessMove(move.getEndPosition(), move.getStartPosition(), null);
         ChessPiece piece = board.getPiece(move.getStartPosition());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
@@ -113,7 +111,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return (isInCheck(teamColor) && isInStalemate(teamColor));
     }
 
     /**
@@ -130,12 +128,16 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(position);
                 if (piece != null && piece.getTeamColor() == teamColor){
                     for (ChessMove move : piece.pieceMoves(board,position)){
+                        ChessMove reverseLastMove = new ChessMove(move.getEndPosition(), move.getStartPosition(), null);
+                        ChessPiece pieceTaken = board.getPiece(move.getEndPosition());
                         fakeMove(move);
                         if (!isInCheck(teamColor)){
                             fakeMove(reverseLastMove);
+                            board.addPiece(reverseLastMove.getStartPosition(), pieceTaken);
                             return false;
                         }
                         fakeMove(reverseLastMove);
+                        board.addPiece(reverseLastMove.getStartPosition(), pieceTaken);
                     }
                 }
             }
