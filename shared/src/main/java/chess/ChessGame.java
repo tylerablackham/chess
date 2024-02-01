@@ -61,11 +61,11 @@ public class ChessGame {
             for (ChessMove move : piece.pieceMoves(board,startPosition)){
                 ChessMove reversed = new ChessMove(move.getEndPosition(), move.getStartPosition(), null);
                 ChessPiece captured = board.getPiece(move.getEndPosition());
-                fakeMove(move);
+                movePiece(move);
                 if (!isInCheck(piece.getTeamColor())){
                     vMoves.add(move);
                 }
-                fakeMove(reversed);
+                movePiece(reversed);
                 board.addPiece(move.getEndPosition(), captured);
             }
             return vMoves;
@@ -79,10 +79,21 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        if(board.getPiece(move.getStartPosition()).getTeamColor() != turn){
+            throw new InvalidMoveException("It is not this team's turn!");
+        }
+        if(validMoves(move.getStartPosition()).contains(move)){
+            movePiece(move);
+            if (move.getPromotionPiece() != null){
+                board.getPiece(move.getEndPosition()).setPieceType(move.getPromotionPiece());
+            }
+            turn = turn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        } else {
+            throw new InvalidMoveException("This is not a valid move!");
+        }
     }
 
-    private void fakeMove(ChessMove move){
+    private void movePiece(ChessMove move){
         ChessPiece piece = board.getPiece(move.getStartPosition());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
@@ -148,13 +159,13 @@ public class ChessGame {
                     for (ChessMove move : piece.pieceMoves(board,position)){
                         ChessMove reverseLastMove = new ChessMove(move.getEndPosition(), move.getStartPosition(), null);
                         ChessPiece pieceTaken = board.getPiece(move.getEndPosition());
-                        fakeMove(move);
+                        movePiece(move);
                         if (!isInCheck(teamColor)){
-                            fakeMove(reverseLastMove);
+                            movePiece(reverseLastMove);
                             board.addPiece(reverseLastMove.getStartPosition(), pieceTaken);
                             return false;
                         }
-                        fakeMove(reverseLastMove);
+                        movePiece(reverseLastMove);
                         board.addPiece(reverseLastMove.getStartPosition(), pieceTaken);
                     }
                 }

@@ -51,6 +51,11 @@ public class ChessPiece {
      *
      * @return Collection of valid moves
      */
+
+    public void setPieceType(PieceType pieceType) {
+        this.pieceType = pieceType;
+    }
+
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         ChessGame.TeamColor myColor = board.getPiece(myPosition).color;
         return switch (pieceType) {
@@ -253,7 +258,7 @@ public class ChessPiece {
                 moves.add(new ChessMove(myPosition,new ChessPosition(row + (direction * 2), col), null));
             }
         }
-        if (board.getPiece(new ChessPosition(row + direction, col + 1)) != null &&
+        if (col != 8 && board.getPiece(new ChessPosition(row + direction, col + 1)) != null &&
                 board.getPiece(new ChessPosition(row + direction, col + 1)).color != myColor){
             if (madeIt) {
                 for (PieceType type : promotions) {
@@ -264,7 +269,7 @@ public class ChessPiece {
                 moves.add(new ChessMove(myPosition,new ChessPosition(row + direction, col + 1), null));
             }
         }
-        if (board.getPiece(new ChessPosition(row + direction, col - 1)) != null &&
+        if (col != 1 && board.getPiece(new ChessPosition(row + direction, col - 1)) != null &&
                 board.getPiece(new ChessPosition(row + direction, col - 1)).color != myColor){
             if (madeIt) {
                 for (PieceType type : promotions) {
