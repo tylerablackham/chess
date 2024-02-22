@@ -4,9 +4,9 @@ import chess.ChessGame;
 import model.GameData;
 
 public interface GameDAO {
-    public int createGame(String gameName); //returns gameID after creating Game
-    public GameData getGame(int gameID);
-    public GameData[] listGames();
-    public void updateGame(int gameID, String username, String clientColor, ChessGame game);
-    public void clear();
+    public int createGame(GameData gameData) throws DataAccessException; //returns gameID after creating Game
+    public GameData getGame(int gameID) throws DataAccessException;
+    public GameData[] listGames() throws DataAccessException;
+    public void updateGame(GameData gameData) throws DataAccessException;
+    public void clear() throws DataAccessException;
 }
