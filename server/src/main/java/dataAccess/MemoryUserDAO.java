@@ -7,16 +7,31 @@ public class MemoryUserDAO implements UserDAO{
     private HashMap<String, UserData> userMap = new HashMap<>();
     @Override
     public void creatUser(UserData userData) throws DataAccessException {
-        userMap.put(userData.username(), userData);
+        try{
+            userMap.put(userData.username(), userData);
+        }
+        catch(Exception e) {
+            throw new DataAccessException("Unable to create new user:\n\t" + e.getMessage());
+        }
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
-        return userMap.get(username);
+        try{
+            return userMap.get(username);
+        }
+        catch(Exception e) {
+            throw new DataAccessException("Unable to get user:\n\t" + e.getMessage());
+        }
     }
 
     @Override
     public void clear() throws DataAccessException {
-        userMap = new HashMap<>();
+        try{
+            userMap = new HashMap<>();
+        }
+        catch(Exception e) {
+            throw new DataAccessException("Unable to clear users:\n\t" + e.getMessage());
+        }
     }
 }

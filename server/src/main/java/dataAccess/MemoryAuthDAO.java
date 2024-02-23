@@ -7,22 +7,42 @@ public class MemoryAuthDAO implements AuthDAO {
     private HashMap<String, AuthData> authMap = new HashMap<>();
     @Override
     public String createAuth(AuthData authData) throws DataAccessException {
-        authMap.put(authData.authToken(), authData);
+        try{
+            authMap.put(authData.authToken(), authData);
+        }
+        catch(Exception e) {
+            throw new DataAccessException("Unable to create new auth:\n\t" + e.getMessage());
+        }
         return authData.authToken();
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return authMap.get(authToken);
+        try{
+            return authMap.get(authToken);
+        }
+        catch(Exception e) {
+            throw new DataAccessException("Unable to get auth:\n\t" + e.getMessage());
+        }
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        authMap.remove(authToken);
+        try{
+            authMap.remove(authToken);
+        }
+        catch(Exception e) {
+            throw new DataAccessException("Unable to delete auth:\n\t" + e.getMessage());
+        }
     }
 
     @Override
-    public void clear() {
-        authMap = new HashMap<>();
+    public void clear() throws DataAccessException{
+        try{
+            authMap = new HashMap<>();
+        }
+        catch(Exception e) {
+            throw new DataAccessException("Unable to clear auths:\n\t" + e.getMessage());
+        }
     }
 }
