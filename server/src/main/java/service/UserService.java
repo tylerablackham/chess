@@ -4,6 +4,8 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.AuthData;
+import model.LoginRequest;
+import model.AuthTokenRequest;
 import model.UserData;
 
 import java.util.UUID;
@@ -31,11 +33,11 @@ public class UserService {
             throw new DataAccessException(e.getMessage());
         }
     }
-    public AuthData login(String username, String password) throws DataAccessException {
+    public AuthData login(LoginRequest loginRequest) throws DataAccessException {
         try {
-            if(userDAO.getUser(username) != null){
-                if(userDAO.getUser(username).password() == password){
-                    AuthData auth = new AuthData(UUID.randomUUID().toString(), username);
+            if(userDAO.getUser(loginRequest.username()) != null){
+                if(userDAO.getUser(loginRequest.username()).password() == loginRequest.password()){
+                    AuthData auth = new AuthData(UUID.randomUUID().toString(), loginRequest.username());
                     authDAO.createAuth(auth);
                     return auth;
                 }
@@ -51,10 +53,10 @@ public class UserService {
             throw new DataAccessException(e.getMessage());
         }
     }
-    public void logout(String authToken) throws DataAccessException {
+    public void logout(AuthTokenRequest authTokenRequest) throws DataAccessException {
         try {
-            if (authDAO.getAuth(authToken) != null) {
-                authDAO.deleteAuth(authToken);
+            if (authDAO.getAuth(authTokenRequest.authToken()) != null) {
+                authDAO.deleteAuth(authTokenRequest.authToken());
             }
             else {
                 throw new DataAccessException("DNE");

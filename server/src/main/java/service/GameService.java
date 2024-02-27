@@ -4,8 +4,7 @@ import chess.ChessGame;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
-import model.AuthData;
-import model.GameData;
+import model.*;
 import chess.ChessGame.TeamColor;
 
 public class GameService {
@@ -16,9 +15,9 @@ public class GameService {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
-    public GameData[] listGames(String authToken) throws DataAccessException {
+    public GameData[] listGames(AuthTokenRequest authTokenRequest) throws DataAccessException {
         try {
-            if (authDAO.getAuth(authToken) != null) {
+            if (authDAO.getAuth(authTokenRequest.authToken()) != null) {
                 return gameDAO.listGames();
             }
             else {
@@ -29,10 +28,10 @@ public class GameService {
             throw new DataAccessException(e.getMessage());
         }
     }
-    public int createGame(String authToken, String gameName) throws DataAccessException {
+    public int createGame(CreateGameRequest createGameRequest) throws DataAccessException {
         try {
-            if (authDAO.getAuth(authToken) != null){
-                GameData game = new GameData(gameID, null, null, gameName, new ChessGame());
+            if (authDAO.getAuth(createGameRequest.authToken()) != null){
+                GameData game = new GameData(gameID, null, null, createGameRequest.gameName(), new ChessGame());
                 gameID++;
                 gameDAO.createGame(game);
                 return game.gameID();
@@ -45,14 +44,14 @@ public class GameService {
             throw new DataAccessException(e.getMessage());
         }
     }
-    public void joinGame(String authToken, int gameID, TeamColor clientColor) throws DataAccessException {
+    public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
         try {
-            AuthData auth = authDAO.getAuth(authToken);
+            AuthData auth = authDAO.getAuth(joinGameRequest.authToken());
             if (auth != null) {
                 GameData game = gameDAO.getGame(gameID);
                 if (game!= null){
                     GameData newGame;
-                    if (clientColor == TeamColor.WHITE){
+                    if (joinGameRequest.clientColor() == TeamColor.WHITE){
                         newGame = new GameData(gameID, auth.username(), game.blackUsername(), game.gameName(), game.game());
                     }
                     else {
