@@ -11,7 +11,7 @@ public class MemoryGameDAO implements GameDAO{
             gameMap.put(gameData.gameID(), gameData);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to create new game:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to create new game:\n\t" + e.getMessage());
         }
         return gameData.gameID();
     }
@@ -22,7 +22,7 @@ public class MemoryGameDAO implements GameDAO{
             return gameMap.get(gameID);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to get game:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to get game:\n\t" + e.getMessage());
         }
     }
 
@@ -32,7 +32,7 @@ public class MemoryGameDAO implements GameDAO{
             return gameMap.values().toArray(new GameData[0]);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to get list of games:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to get list of games:\n\t" + e.getMessage());
         }
     }
 
@@ -42,7 +42,7 @@ public class MemoryGameDAO implements GameDAO{
             gameMap.replace(gameData.gameID(), gameData);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to update game:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to update game:\n\t" + e.getMessage());
         }
     }
 
@@ -52,7 +52,7 @@ public class MemoryGameDAO implements GameDAO{
             gameMap = new HashMap<>();
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to clear games:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to clear games:\n\t" + e.getMessage());
         }
     }
 }

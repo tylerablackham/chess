@@ -11,7 +11,7 @@ public class MemoryAuthDAO implements AuthDAO {
             authMap.put(authData.authToken(), authData);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to create new auth:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to create new auth:\n\t" + e.getMessage());
         }
         return authData.authToken();
     }
@@ -22,7 +22,7 @@ public class MemoryAuthDAO implements AuthDAO {
             return authMap.get(authToken);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to get auth:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to get auth:\n\t" + e.getMessage());
         }
     }
 
@@ -32,7 +32,7 @@ public class MemoryAuthDAO implements AuthDAO {
             authMap.remove(authToken);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to delete auth:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to delete auth:\n\t" + e.getMessage());
         }
     }
 
@@ -42,7 +42,7 @@ public class MemoryAuthDAO implements AuthDAO {
             authMap = new HashMap<>();
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to clear auths:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to clear auths:\n\t" + e.getMessage());
         }
     }
 }

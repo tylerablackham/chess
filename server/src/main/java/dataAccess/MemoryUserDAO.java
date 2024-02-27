@@ -11,7 +11,7 @@ public class MemoryUserDAO implements UserDAO{
             userMap.put(userData.username(), userData);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to create new user:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to create new user:\n\t" + e.getMessage());
         }
     }
 
@@ -21,7 +21,7 @@ public class MemoryUserDAO implements UserDAO{
             return userMap.get(username);
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to get user:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to get user:\n\t" + e.getMessage());
         }
     }
 
@@ -31,7 +31,7 @@ public class MemoryUserDAO implements UserDAO{
             userMap = new HashMap<>();
         }
         catch(Exception e) {
-            throw new DataAccessException("Unable to clear users:\n\t" + e.getMessage());
+            throw new DataAccessException("Error: Unable to clear users\n\t" + e.getMessage());
         }
     }
 }
