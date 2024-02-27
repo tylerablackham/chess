@@ -5,7 +5,7 @@ import dataAccess.DataAccessException;
 import dataAccess.UserDAO;
 import model.AuthData;
 import model.LoginRequest;
-import model.AuthTokenRequest;
+import model.AuthToken;
 import model.UserData;
 
 import java.util.UUID;
@@ -42,24 +42,24 @@ public class UserService {
                     return auth;
                 }
                 else {
-                    throw new DataAccessException("Wrong Password");
+                    throw new DataAccessException("Unauthorized");
                 }
             }
             else {
-                throw new DataAccessException("DNE");
+                throw new DataAccessException("Unauthorized");
             }
         }
         catch (DataAccessException e){
             throw new DataAccessException(e.getMessage());
         }
     }
-    public void logout(AuthTokenRequest authTokenRequest) throws DataAccessException {
+    public void logout(AuthToken authToken) throws DataAccessException {
         try {
-            if (authDAO.getAuth(authTokenRequest.authToken()) != null) {
-                authDAO.deleteAuth(authTokenRequest.authToken());
+            if (authDAO.getAuth(authToken.authToken()) != null) {
+                authDAO.deleteAuth(authToken.authToken());
             }
             else {
-                throw new DataAccessException("DNE");
+                throw new DataAccessException("Unauthorized");
             }
         }
         catch (DataAccessException e) {
