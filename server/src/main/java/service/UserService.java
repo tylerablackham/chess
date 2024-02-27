@@ -8,6 +8,7 @@ import model.LoginRequest;
 import model.AuthToken;
 import model.UserData;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
@@ -36,7 +37,7 @@ public class UserService {
     public AuthData login(LoginRequest loginRequest) throws DataAccessException {
         try {
             if(userDAO.getUser(loginRequest.username()) != null){
-                if(userDAO.getUser(loginRequest.username()).password() == loginRequest.password()){
+                if(Objects.equals(userDAO.getUser(loginRequest.username()).password(), loginRequest.password())){
                     AuthData auth = new AuthData(UUID.randomUUID().toString(), loginRequest.username());
                     authDAO.createAuth(auth);
                     return auth;

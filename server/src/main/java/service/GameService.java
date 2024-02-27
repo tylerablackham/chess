@@ -50,23 +50,23 @@ public class GameService {
         try {
             AuthData auth = authDAO.getAuth(joinGameRequest.authToken());
             if (auth != null) {
-                GameData game = gameDAO.getGame(gameID);
+                GameData game = gameDAO.getGame(joinGameRequest.gameID());
                 if (game!= null){
                     GameData newGame;
                     if (joinGameRequest.clientColor() == TeamColor.WHITE){
                         if (game.whiteUsername() != null) {
                             throw new DataAccessException("Taken");
                         }
-                        newGame = new GameData(gameID, auth.username(), game.blackUsername(), game.gameName(), game.game());
+                        newGame = new GameData(joinGameRequest.gameID(), auth.username(), game.blackUsername(), game.gameName(), game.game());
                     }
                     else if (joinGameRequest.clientColor() == TeamColor.BLACK) {
                         if (game.blackUsername() != null) {
                             throw new DataAccessException("Taken");
                         }
-                        newGame = new GameData(gameID, game.whiteUsername(), auth.username(), game.gameName(), game.game());
+                        newGame = new GameData(joinGameRequest.gameID(), game.whiteUsername(), auth.username(), game.gameName(), game.game());
                     }
                     else {
-                        newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+                        newGame = new GameData(joinGameRequest.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
                     }
                     gameDAO.updateGame(newGame);
                 }
