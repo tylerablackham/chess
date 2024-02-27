@@ -6,7 +6,6 @@ import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import model.*;
 import chess.ChessGame.TeamColor;
-import org.springframework.security.core.parameters.P;
 
 public class GameService {
     static int gameID;
@@ -53,13 +52,13 @@ public class GameService {
                 GameData game = gameDAO.getGame(joinGameRequest.gameID());
                 if (game!= null){
                     GameData newGame;
-                    if (joinGameRequest.clientColor() == TeamColor.WHITE){
+                    if (joinGameRequest.playerColor() == TeamColor.WHITE){
                         if (game.whiteUsername() != null) {
                             throw new DataAccessException("Taken");
                         }
                         newGame = new GameData(joinGameRequest.gameID(), auth.username(), game.blackUsername(), game.gameName(), game.game());
                     }
-                    else if (joinGameRequest.clientColor() == TeamColor.BLACK) {
+                    else if (joinGameRequest.playerColor() == TeamColor.BLACK) {
                         if (game.blackUsername() != null) {
                             throw new DataAccessException("Taken");
                         }
@@ -75,7 +74,7 @@ public class GameService {
                 }
             }
             else {
-                throw new DataAccessException("Not Authorized");
+                throw new DataAccessException("Unauthorized");
             }
         }
         catch (DataAccessException e) {
