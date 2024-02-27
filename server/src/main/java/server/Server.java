@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import dataAccess.*;
 import model.*;
 import model.Error;
@@ -35,7 +36,6 @@ public class Server {
 
         Spark.staticFiles.location("web");
 
-
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
@@ -58,7 +58,7 @@ public class Server {
         try {
             databaseService.clearApplication();
             res.status(200);
-            return "";
+            return new JsonObject();
         }
         catch (DataAccessException e) {
             res.status(500);
@@ -93,12 +93,7 @@ public class Server {
             return new Gson().toJson(authData);
         }
         catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "Unauthorized")){
-                res.status(401);
-                return new Gson().toJson(new Error("Error: unauthorized"));
-            }
-            res.status(500);
-            return new Gson().toJson(new Error(e.getMessage()));
+            return checkUnauthorized(e, res);
         }
     }
     private Object logout(Request req, Response res) {
@@ -106,15 +101,10 @@ public class Server {
         try {
             userService.logout(authToken);
             res.status(200);
-            return "";
+            return new JsonObject();
         }
         catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "Unauthorized")){
-                res.status(401);
-                return new Gson().toJson(new Error("Error: unauthorized"));
-            }
-            res.status(500);
-            return new Gson().toJson(new Error(e.getMessage()));
+            return checkUnauthorized(e, res);
         }
     }
     private Object listGames(Request req, Response res) {
@@ -125,12 +115,7 @@ public class Server {
             return new Gson().toJson(gameList);
         }
         catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "Unauthorized")){
-                res.status(401);
-                return new Gson().toJson(new Error("Error: unauthorized"));
-            }
-            res.status(500);
-            return new Gson().toJson(new Error(e.getMessage()));
+            return checkUnauthorized(e, res);
         }
     }
     private Object createGame(Request req, Response res) {
@@ -146,12 +131,7 @@ public class Server {
             return new Gson().toJson(createGameResponse);
         }
         catch (DataAccessException e) {
-            if (Objects.equals(e.getMessage(), "Unauthorized")){
-                res.status(401);
-                return new Gson().toJson(new Error("Error: unauthorized"));
-            }
-            res.status(500);
-            return new Gson().toJson(new Error(e.getMessage()));
+            return checkUnauthorized(e, res);
         }
     }
     private Object joinGame(Request req, Response res) {
@@ -164,24 +144,27 @@ public class Server {
         try {
             gameService.joinGame(joinGameRequest);
             res.status(200);
-            return "";
+            return new JsonObject();
         }
         catch (DataAccessException e) {
             if (Objects.equals(e.getMessage(), "Game Does Not Exist")){
                 res.status(400);
                 return new Gson().toJson(new Error("Error: bad request"));
             }
-            if (Objects.equals(e.getMessage(), "Unauthorized")){
-                res.status(401);
-                return new Gson().toJson(new Error("Error: unauthorized"));
-            }
             if (Objects.equals(e.getMessage(), "Taken")){
                 res.status(403);
                 return new Gson().toJson(new Error("Error: already taken"));
             }
-            res.status(500);
-            return new Gson().toJson(new Error(e.getMessage()));
+            return checkUnauthorized(e, res);
         }
     }
 
+    private Object checkUnauthorized(DataAccessException e, Response res){
+        if (Objects.equals(e.getMessage(), "Unauthorized")){
+            res.status(401);
+            return new Gson().toJson(new Error("Error: unauthorized"));
+        }
+        res.status(500);
+        return new Gson().toJson(new Error(e.getMessage()));
+    }
 }
