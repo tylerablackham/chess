@@ -84,15 +84,17 @@ public class ChessPiece {
         }
         return moves;
     }
-
-    public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor){
+    public interface DirectionalFunction {
+        boolean evaluate(int r, int c);
+    }
+    public Collection<ChessMove> getMovesInDirection(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor, DirectionalFunction directionalFunction  ){
         HashSet<ChessMove> moves = new HashSet<>();
         int row = myPosition.getRow();
         int col = myPosition.getColumn();
         for (int r = -1; r <= 1; r++){
             for (int c = -1; c <= 1; c++){
                 boolean canMove = true;
-                if (r != 0 || c != 0){
+                if (directionalFunction.evaluate(r,c)){
                     for (int i = 1; i <= 8; i++){
                         if(canMove && row + r*i <= 8 && row + r*i >= 1 && col + c*i <= 8 && col + c*i >= 1){
                             ChessPosition position = new ChessPosition(row + r*i, col + c*i);
@@ -112,31 +114,12 @@ public class ChessPiece {
         return moves;
     }
 
+    public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor){
+        return getMovesInDirection(board, myPosition,myColor, (r,c) -> (r != 0 || c != 0));
+    }
+
     public Collection<ChessMove> bishopMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor){
-        HashSet<ChessMove> moves = new HashSet<>();
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        for (int r = -1; r <= 1; r++){
-            for (int c = -1; c <= 1; c++){
-                boolean canMove = true;
-                if (r != 0 && c != 0){
-                    for (int i = 1; i <= 8; i++){
-                        if(canMove && row + r*i <= 8 && row + r*i >= 1 && col + c*i <= 8 && col + c*i >= 1){
-                            ChessPosition position = new ChessPosition(row + r*i, col + c*i);
-                            if(board.getPiece(position) == null || board.getPiece(position).getTeamColor() != myColor){
-                                moves.add(new ChessMove(myPosition, position, null));
-                                if(board.getPiece(position) != null && board.getPiece(position).getTeamColor() != myColor){
-                                    canMove = false;
-                                }
-                            } else {
-                                canMove = false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return moves;
+        return getMovesInDirection(board, myPosition,myColor, (r,c) -> (r != 0 && c != 0));
     }
 
     public Collection<ChessMove> knightMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor){
@@ -163,30 +146,7 @@ public class ChessPiece {
     }
 
     public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor){
-        HashSet<ChessMove> moves = new HashSet<>();
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn();
-        for (int r = -1; r <= 1; r++){
-            for (int c = -1; c <= 1; c++){
-                boolean canMove = true;
-                if (r == 0 || c == 0){
-                    for (int i = 1; i <= 8; i++){
-                        if(canMove && row + r*i <= 8 && row + r*i >= 1 && col + c*i <= 8 && col + c*i >= 1){
-                            ChessPosition position = new ChessPosition(row + r*i, col + c*i);
-                            if(board.getPiece(position) == null || board.getPiece(position).getTeamColor() != myColor){
-                                moves.add(new ChessMove(myPosition, position, null));
-                                if(board.getPiece(position) != null && board.getPiece(position).getTeamColor() != myColor){
-                                    canMove = false;
-                                }
-                            } else {
-                                canMove = false;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return moves;
+        return getMovesInDirection(board, myPosition,myColor, (r,c) -> (r == 0 || c == 0));
     }
 
     private Collection<ChessMove> pawnMoves(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
