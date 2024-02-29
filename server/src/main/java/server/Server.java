@@ -35,7 +35,6 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-        // Spark.staticFiles.externalLocation("C:\\Users\\tyler\\Desktop\\School\\CS-240\\chess\\server\\src\\main\\resources\\web");
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear);
