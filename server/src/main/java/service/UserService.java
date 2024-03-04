@@ -21,7 +21,7 @@ public class UserService {
     public AuthData register(UserData user) throws DataAccessException {
         try{
             if(userDAO.getUser(user.username()) == null){
-                userDAO.creatUser(user);
+                userDAO.createUser(user);
                 AuthData auth = new AuthData(UUID.randomUUID().toString(), user.username());
                 authDAO.createAuth(auth);
                 return auth;
