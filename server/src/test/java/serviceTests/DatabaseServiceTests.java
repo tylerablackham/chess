@@ -7,8 +7,6 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import service.DatabaseService;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class DatabaseServiceTests {
     private MemoryUserDAO memoryUserDAO;
     private MemoryGameDAO memoryGameDAO;
@@ -26,7 +24,7 @@ class DatabaseServiceTests {
     @Test
     @DisplayName("Clear Application - Positive Test")
     void clearApplication() throws DataAccessException {
-        memoryUserDAO.creatUser(new UserData("Username", "Password", "email"));
+        memoryUserDAO.createUser(new UserData("Username", "Password", "email"));
         memoryAuthDAO.createAuth(new AuthData("AuthToken", "Username"));
         memoryGameDAO.createGame(new GameData(1, "", "","Game1", null));
         memoryGameDAO.createGame(new GameData(2, "", "","Game2", null));
