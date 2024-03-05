@@ -32,6 +32,6 @@ class DatabaseServiceTests {
         Assertions.assertNull(memoryUserDAO.getUser("Username"));
         Assertions.assertNull(memoryAuthDAO.getAuth("AuthToken"));
         Assertions.assertNull(memoryGameDAO.getGame(1));
-        Assertions.assertEquals(0, memoryGameDAO.listGames().length);
+        Assertions.assertEquals(0, memoryGameDAO.listGames().size());
     }
 }

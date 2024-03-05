@@ -31,8 +31,8 @@ public class GameServiceTests {
         memoryGameDAO.createGame(new GameData(1, "","", "Game1", null));
         memoryGameDAO.createGame(new GameData(2, "","", "Game2", null));
         GameList gameList = gameService.listGames(new AuthToken("AuthToken"));
-        Assertions.assertEquals(2, gameList.games().length);
-        Assertions.assertEquals("Game2", gameList.games()[1].gameName());
+        Assertions.assertEquals(2, gameList.games().size());
+        Assertions.assertEquals("Game2", gameList.games().get(1).gameName());
     }
 
     @Test
@@ -47,7 +47,7 @@ public class GameServiceTests {
     @DisplayName("Create Game - Positive Test")
     void positiveCreateGame() throws DataAccessException {
         CreateGameResponse createGameResponse = gameService.createGame(new CreateGameRequest("AuthToken", "Game1"));
-        Assertions.assertEquals(1, memoryGameDAO.listGames().length);
+        Assertions.assertEquals(1, memoryGameDAO.listGames().size());
         Assertions.assertEquals("Game1", memoryGameDAO.getGame(createGameResponse.gameID()).gameName());
     }
 

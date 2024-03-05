@@ -1,6 +1,9 @@
 package dataAccess;
 
 import model.GameData;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO{
@@ -27,9 +30,10 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public GameData[] listGames() throws DataAccessException {
+    public ArrayList<GameData> listGames() throws DataAccessException {
         try{
-            return gameMap.values().toArray(new GameData[0]);
+            GameData[] values = gameMap.values().toArray(new GameData[0]);
+            return new ArrayList<>(Arrays.asList(values));
         }
         catch(Exception e) {
             throw new DataAccessException("Error: Unable to get list of games:\n\t" + e.getMessage());

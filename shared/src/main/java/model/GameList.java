@@ -1,4 +1,6 @@
 package model;
 
-public record GameList(GameData[] games) {
+import java.util.ArrayList;
+
+public record GameList(ArrayList<GameData> games) {
 }
