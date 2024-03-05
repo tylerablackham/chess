@@ -19,7 +19,7 @@ class SQLUserDAOTest {
     }
 
     @AfterEach
-    void cleanup() throws DataAccessException {
+    void tearDown() throws DataAccessException {
         userDAO.clear();
     }
 
