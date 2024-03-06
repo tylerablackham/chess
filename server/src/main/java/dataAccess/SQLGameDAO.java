@@ -12,8 +12,12 @@ import static java.sql.Types.NULL;
 
 public class SQLGameDAO implements GameDAO{
 
-    public SQLGameDAO() throws DataAccessException {
-        configureDatabase();
+    public SQLGameDAO() {
+        try {
+            configureDatabase();
+        } catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
     }
     @Override
     public int createGame(GameData gameData) throws DataAccessException {
@@ -91,19 +95,6 @@ public class SQLGameDAO implements GameDAO{
     };
 
     private void configureDatabase() throws DataAccessException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT COUNT(*) AS count FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                ps.setString(1, "chess");
-//                try (var rs = ps.executeQuery()) {
-//                    if(rs.getInt(1) == 0){
-//                        DatabaseManager.createDatabase();
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new DataAccessException( String.format("Unable to read data: %s", e.getMessage()));
-//        }
         SQLHelper.configureDatabase(createStatements);
     }
 }

@@ -10,8 +10,12 @@ import static java.sql.Types.NULL;
 
 public class SQLAuthDAO implements AuthDAO{
 
-    public SQLAuthDAO() throws DataAccessException {
-        configureDatabase();
+    public SQLAuthDAO() {
+        try {
+            configureDatabase();
+        } catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
@@ -62,19 +66,6 @@ public class SQLAuthDAO implements AuthDAO{
     };
 
     private void configureDatabase() throws DataAccessException {
-//        try (var conn = DatabaseManager.getConnection()) {
-//            var statement = "SELECT COUNT(*) AS count FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = ?";
-//            try (var ps = conn.prepareStatement(statement)) {
-//                ps.setString(1, "chess");
-//                try (var rs = ps.executeQuery()) {
-//                    if(rs.getInt(1) == 0){
-//                        DatabaseManager.createDatabase();
-//                    }
-//                }
-//            }
-//        } catch (Exception e) {
-//            throw new DataAccessException( String.format("Unable to read data: %s", e.getMessage()));
-//        }
         SQLHelper.configureDatabase(createStatements);
     }
 }

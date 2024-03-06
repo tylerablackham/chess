@@ -26,8 +26,8 @@ public class Server {
         userService = new UserService(userDAO, authDAO);
     }
 
-    public Server(){
-        this(new MemoryUserDAO(), new MemoryGameDAO(), new MemoryAuthDAO());
+    public Server() {
+        this(new SQLUserDAO(), new SQLGameDAO(), new SQLAuthDAO());
     }
 
 
