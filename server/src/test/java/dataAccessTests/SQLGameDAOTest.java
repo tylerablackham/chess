@@ -4,10 +4,7 @@ import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.SQLGameDAO;
 import model.GameData;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.util.ArrayList;
 
@@ -19,6 +16,7 @@ class SQLGameDAOTest {
     @BeforeEach
     void setUp() throws DataAccessException {
         gameDAO = new SQLGameDAO();
+        gameDAO.clear();
     }
 
     @AfterEach

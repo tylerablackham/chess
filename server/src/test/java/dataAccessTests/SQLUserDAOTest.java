@@ -16,6 +16,7 @@ class SQLUserDAOTest {
     @BeforeEach
     void setup() throws DataAccessException {
         userDAO = new SQLUserDAO();
+        userDAO.clear();
     }
 
     @AfterEach

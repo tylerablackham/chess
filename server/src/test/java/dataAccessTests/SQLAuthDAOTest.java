@@ -17,6 +17,7 @@ class SQLAuthDAOTest {
     @BeforeEach
     void setUp() throws DataAccessException {
         authDAO = new SQLAuthDAO();
+        authDAO.clear();
     }
 
     @AfterEach
