@@ -17,7 +17,7 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         var statement = "INSERT INTO user (username, password, email) VALUES (?, ?, ?)";
-        executeUpdate(statement, userData.username(), userData.password(), userData.email());
+        SQLHelper.executeUpdate(statement, userData.username(), userData.password(), userData.email());
     }
 
     @Override
@@ -41,23 +41,9 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE user";
-        executeUpdate(statement);
+        SQLHelper.executeUpdate(statement);
     }
 
-    private void executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ps.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
-    }
 
     private final String[] createStatements = {
             """
@@ -84,15 +70,6 @@ public class SQLUserDAO implements UserDAO{
 //        } catch (Exception e) {
 //            throw new DataAccessException( String.format("Unable to read data: %s", e.getMessage()));
 //        }
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-            for (var statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
-        }
+        SQLHelper.configureDatabase(createStatements);
     }
 }
