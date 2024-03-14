@@ -1,4 +1,200 @@
 package client;
 
+import chess.ChessGame;
+import model.*;
+
+import java.util.Objects;
+import java.util.Scanner;
+
 public class Menus {
+    private String authToken;
+    private boolean hasNotQuit;
+    Scanner scan;
+    public static void main(String[] args){
+        Menus menus = new Menus();
+        menus.showMenus();
+    }
+
+    public Menus() {
+        authToken = "";
+        hasNotQuit = true;
+        scan = new Scanner(System.in);
+    }
+
+    public void showMenus() {
+        while (hasNotQuit) {
+            if (Objects.equals(authToken, "")) {
+                loggedOutMenu();
+            }
+            else {
+                loggedInMenu();
+            }
+        }
+    }
+
+    private void loggedOutMenu() {
+        System.out.println("""
+                Welcome to 240 Chess. Type 'help' if you have any questions.
+                
+                You are currently not logged in. Here are the following actions you can take:
+                 - Register: type 'register'
+                 - Login: type 'login'
+                 - Quit: type 'quit'
+                 - Help: type 'help'
+                """);
+        String in = scan.nextLine().toLowerCase().trim();
+        switch (in){
+            case "register":
+                register();
+                break;
+            case "login":
+                login();
+                break;
+            case "quit":
+                quit();
+                break;
+            case "help":
+                helpPreLogin();
+                break;
+            default: System.out.println(in + " is not recognized. Please try again\n");
+        }
+    }
+
+    private void loggedInMenu() {
+        System.out.println("""
+                Welcome to 240 Chess. Type 'help' if you have any questions.
+                
+                You are currently logged in. Here are the following actions you can take:
+                 - Create Game: type 'create'
+                 - List Games: type 'list'
+                 - Join Game: type 'join'
+                 - Observe: type 'observe'
+                 - Logout: type 'logout'
+                 - Quit: type 'quit'
+                 - Help: type 'help'
+                """);
+        String in = scan.nextLine().toLowerCase().trim();
+        switch (in){
+            case "create":
+                createGame();
+                break;
+            case "list":
+                listGames();
+                break;
+            case "join":
+                joinGame();
+                break;
+            case "observe":
+                observe();
+                break;
+            case "logout":
+                logout();
+                break;
+            case "quit":
+                quit();
+                break;
+            case "help":
+                helpPostLogin();
+                break;
+            default: System.out.println(in + " is not recognized. Please try again\n");
+        }
+    }
+
+    private void register() {
+        System.out.println("Please enter a username.");
+        String username = scan.nextLine();
+        System.out.println("Please enter a password.");
+        String password = scan.nextLine();
+        System.out.println("Please enter your email.");
+        String email = scan.nextLine();
+        UserData userData = new UserData(username, password, email);
+
+        System.out.println(userData);
+
+        authToken = "auth";
+    }
+
+    private void login() {
+        System.out.println("Please enter your username.");
+        String username = scan.nextLine();
+        System.out.println("Please enter your password.");
+        String password = scan.nextLine();
+        LoginRequest loginRequest = new LoginRequest(username, password);
+
+        System.out.println(loginRequest);
+
+        authToken = "auth";
+    }
+
+    private void createGame() {
+        System.out.println("What would you like to name your game?");
+        String gameName = scan.nextLine();
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
+
+        System.out.println(createGameRequest);
+    }
+
+    private void listGames() {
+        AuthToken authToken1 = new AuthToken(authToken);
+
+        System.out.println(authToken1);
+    }
+
+    private void joinGame() {
+        System.out.println("Enter the ID number for the game you would like to join.");
+        int gameID = Integer.parseInt(scan.nextLine().trim());
+        System.out.println("What team will you be on? (White or Black)");
+        String color = scan.nextLine().trim().toLowerCase();
+        if (color.equals("black") || color.equals("white")){
+            ChessGame.TeamColor playerColor = color.equals("black") ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
+            JoinGameRequest joinGameRequest =  new JoinGameRequest(authToken, gameID, playerColor);
+
+            System.out.println(joinGameRequest);
+        }
+        else {
+            System.out.println("Unrecognized team color. Please try again.");
+            joinGame();
+        }
+    }
+
+    private void observe() {
+        System.out.println("Enter the ID number for the game you would like to observe.");
+        int gameID = Integer.parseInt(scan.nextLine().trim());
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameID, null);
+
+        System.out.println(joinGameRequest);
+    }
+
+    private void logout() {
+        authToken = "";
+    }
+
+    private void quit() {
+        hasNotQuit = false;
+    }
+
+    private void helpPreLogin() {
+        System.out.println("""
+                Register: Type 'register' to play, if you haven't registered yet.
+                Login: Type 'login' to play, if you have already registered.
+                Quit: Type 'quit' to stop running the program.
+                
+                Press enter to continue.
+                """);
+        scan.nextLine();
+    }
+
+    private void helpPostLogin() {
+        System.out.println("""
+                Create Game: Type 'create' to make a new game.
+                List Games: Type 'list' to list all existing games.
+                Join Game: Type 'join' to join and play in an existing game.
+                Observe: Type 'observe' to watch a game being played.
+                Logout: Type 'logout' to logout of your current session.
+                Quit: Type 'quit' to stop running the program.
+                
+                Press enter to continue.
+                """);
+        scan.nextLine();
+    }
 }
