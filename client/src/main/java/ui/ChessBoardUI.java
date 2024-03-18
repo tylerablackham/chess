@@ -46,22 +46,22 @@ public class ChessBoardUI {
     }
 
     private void drawHeaderFooter() {
-        String[] letters = !isFacingBlack ? new String[]{" a ", " b ", " c ", " d ", " e ", " f ", " g ", " h "} :
-                new String[]{" h ", " g ", " f ", " e ", " d ", " c ", " b ", " a "};
+        String[] letters = !isFacingBlack ? new String[]{"a", "b", "c", "d", "e", "f", "g", "h"} :
+                new String[]{"h", "g", "f", "e", "d", "c", "b", "a"};
         out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         out.print("   ");
         for (String letter : letters){
-            out.print(letter);
+            out.print("\u2002\u2002" + letter + "\u2002");
         }
-        out.print("   ");
+        out.print("   \u2009");
         out.println(EscapeSequences.RESET_BG_COLOR);
     }
 
     private void drawRow(ChessPiece[] row, int rowNum) {
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
-        out.print(" " + (8 - rowNum) + " ");
+        out.print(" " + (8 - rowNum) + " \u2009");
         if (isFacingBlack) {
             for (int i = row.length - 1; i >= 0; i--){
                 drawCell(row[i], rowNum, i);
@@ -96,15 +96,15 @@ public class ChessBoardUI {
 
     private String returnStringRepresentation(ChessPiece piece) {
         if (piece == null) {
-            return "   ";
+            return EscapeSequences.EMPTY;
         }
         return switch (piece.getPieceType()){
-            case KING -> " K ";
-            case QUEEN -> " Q ";
-            case BISHOP -> " B ";
-            case KNIGHT -> " N ";
-            case ROOK -> " R ";
-            case PAWN -> " P ";
+            case KING -> EscapeSequences.BLACK_KING;
+            case QUEEN -> EscapeSequences.BLACK_QUEEN;
+            case BISHOP -> EscapeSequences.BLACK_BISHOP;
+            case KNIGHT -> EscapeSequences.BLACK_KNIGHT;
+            case ROOK -> EscapeSequences.BLACK_ROOK;
+            case PAWN -> EscapeSequences.BLACK_PAWN;
         };
     }
 
