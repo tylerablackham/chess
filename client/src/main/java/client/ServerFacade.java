@@ -52,8 +52,39 @@ public class ServerFacade {
             }
         }
     }
-    public String login(LoginRequest loginRequest) {
-        return "";
+    public AuthData login(LoginRequest loginRequest) throws IOException {
+        URL url = new URL(serverUrl + "/session");
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("POST");
+        http.setDoOutput(true);
+
+        http.connect();
+
+        try(OutputStream body = http.getOutputStream()) {
+            byte[] input = new Gson().toJson(loginRequest).getBytes();
+            body.write(input, 0, input.length);
+        }
+        int responseCode = http.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getInputStream(), StandardCharsets.UTF_8))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                return new Gson().fromJson(response.toString(), AuthData.class);
+            }
+        } else {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                Error error = new Gson().fromJson(response.toString(), Error.class);
+                throw new IOException("Server error: " + error.message());
+            }
+        }
     }
 
     public CreateGameResponse createGame(CreateGameRequest createGameRequest) {

@@ -2,6 +2,7 @@ package clientTests;
 
 import dataAccess.*;
 import model.AuthData;
+import model.LoginRequest;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -61,12 +62,17 @@ public class ServerFacadeTests {
         });
     }
     @Test
-    public void positiveLogin() {
-
+    public void positiveLogin() throws IOException, DataAccessException {
+        userDAO.createUser(new UserData("user", "pass", "email"));
+        AuthData authData = facade.login(new LoginRequest("user", "pass"));
+        Assertions.assertNotNull(authData);
+        Assertions.assertEquals("user", authData.username());
     }
     @Test
     public void negativeLogin() {
-
+        Assertions.assertThrows(IOException.class, () -> {
+           facade.login(new LoginRequest("user", "pass"));
+        });
     }
     @Test
     public void positiveCreateGame() {
