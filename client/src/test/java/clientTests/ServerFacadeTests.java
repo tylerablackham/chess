@@ -1,5 +1,6 @@
 package clientTests;
 
+import chess.ChessGame;
 import dataAccess.*;
 import model.*;
 import org.junit.jupiter.api.*;
@@ -75,8 +76,8 @@ public class ServerFacadeTests {
     @Test
     public void positiveCreateGame() throws DataAccessException, IOException {
         userDAO.createUser(new UserData("user", "pass", "email"));
-        AuthData authData = facade.login(new LoginRequest("user", "pass"));
-        CreateGameResponse response = facade.createGame(new CreateGameRequest(authData.authToken(), "game1"));
+        authDAO.createAuth(new AuthData("auth", "user"));
+        CreateGameResponse response = facade.createGame(new CreateGameRequest("auth", "game1"));
         Assertions.assertNotNull(response);
         Assertions.assertEquals( "game1", gameDAO.getGame(response.gameID()).gameName());
     }
@@ -87,12 +88,20 @@ public class ServerFacadeTests {
         });
     }
     @Test
-    public void positiveListGames() {
-
+    public void positiveListGames() throws DataAccessException, IOException {
+        userDAO.createUser(new UserData("user", "pass", "email"));
+        authDAO.createAuth(new AuthData("auth", "user"));
+        gameDAO.createGame(new GameData(1, null, null, "game1", new ChessGame()));
+        gameDAO.createGame(new GameData(2, null, null, "game2", new ChessGame()));
+        GameList gameList = facade.listGames(new AuthToken("auth"));
+        Assertions.assertNotNull(gameList);
+        Assertions.assertEquals(2, gameList.games().size());
     }
     @Test
     public void negativeListGames() {
-
+        Assertions.assertThrows(IOException.class, () -> {
+            facade.listGames(new AuthToken("auth"));
+        });
     }
     @Test
     public void positiveJoinGame() {
