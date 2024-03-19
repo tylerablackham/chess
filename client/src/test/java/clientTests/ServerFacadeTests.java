@@ -14,9 +14,9 @@ public class ServerFacadeTests {
 
     private static Server server;
     static ServerFacade facade;
-    private static SQLUserDAO userDAO = new SQLUserDAO();
-    private static SQLGameDAO gameDAO = new SQLGameDAO();
-    private static SQLAuthDAO authDAO = new SQLAuthDAO();
+    private static final SQLUserDAO userDAO = new SQLUserDAO();
+    private static final SQLGameDAO gameDAO = new SQLGameDAO();
+    private static final SQLAuthDAO authDAO = new SQLAuthDAO();
 
     @BeforeAll
     public static void init() {
@@ -104,12 +104,23 @@ public class ServerFacadeTests {
         });
     }
     @Test
-    public void positiveJoinGame() {
-
+    public void positiveJoinGame() throws DataAccessException, IOException {
+        userDAO.createUser(new UserData("user", "pass", "email"));
+        authDAO.createAuth(new AuthData("auth", "user"));
+        gameDAO.createGame(new GameData(1, null, null, "game1", new ChessGame()));
+        facade.joinGame(new JoinGameRequest("auth", 1, null));
+        Assertions.assertNull(gameDAO.getGame(1).whiteUsername());
+        Assertions.assertNull(gameDAO.getGame(1).blackUsername());
+        facade.joinGame(new JoinGameRequest("auth", 1, ChessGame.TeamColor.WHITE));
+        Assertions.assertEquals("user", gameDAO.getGame(1).whiteUsername());
+        facade.joinGame(new JoinGameRequest("auth", 1, ChessGame.TeamColor.BLACK));
+        Assertions.assertEquals("user", gameDAO.getGame(1).blackUsername());
     }
     @Test
     public void negativeJoinGame() {
-
+        Assertions.assertThrows(IOException.class, () -> {
+            facade.joinGame(new JoinGameRequest("auth", 1, null));
+        });
     }
     @Test
     public void positiveLogout() {
@@ -119,11 +130,4 @@ public class ServerFacadeTests {
     public void negativeLogout() {
 
     }
-
-
-    @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
-    }
-
 }

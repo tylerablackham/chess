@@ -156,8 +156,31 @@ public class ServerFacade {
         }
     }
 
-    public void joinGame(JoinGameRequest joinGameRequest) {
+    public void joinGame(JoinGameRequest joinGameRequest) throws IOException {
+        URL url = new URL(serverUrl + "/game");
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("PUT");
+        http.setDoOutput(true);
+        http.setRequestProperty("Authorization", joinGameRequest.authToken());
 
+        http.connect();
+
+        try(OutputStream body = http.getOutputStream()) {
+            byte[] input = new Gson().toJson(joinGameRequest).getBytes();
+            body.write(input, 0, input.length);
+        }
+        int responseCode = http.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                Error error = new Gson().fromJson(response.toString(), Error.class);
+                throw new IOException("Server error: " + error.message());
+            }
+        }
     }
 
     public void logout(AuthToken authToken) {
