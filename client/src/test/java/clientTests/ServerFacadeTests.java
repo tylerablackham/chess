@@ -1,9 +1,7 @@
 package clientTests;
 
 import dataAccess.*;
-import model.AuthData;
-import model.LoginRequest;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import client.ServerFacade;
@@ -75,12 +73,18 @@ public class ServerFacadeTests {
         });
     }
     @Test
-    public void positiveCreateGame() {
-
+    public void positiveCreateGame() throws DataAccessException, IOException {
+        userDAO.createUser(new UserData("user", "pass", "email"));
+        AuthData authData = facade.login(new LoginRequest("user", "pass"));
+        CreateGameResponse response = facade.createGame(new CreateGameRequest(authData.authToken(), "game1"));
+        Assertions.assertNotNull(response);
+        Assertions.assertEquals( "game1", gameDAO.getGame(response.gameID()).gameName());
     }
     @Test
     public void negativeCreateGame() {
-
+        Assertions.assertThrows(IOException.class, () -> {
+            facade.createGame(new CreateGameRequest("auth", "game1"));
+        });
     }
     @Test
     public void positiveListGames() {

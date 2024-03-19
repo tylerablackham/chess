@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -87,8 +88,40 @@ public class ServerFacade {
         }
     }
 
-    public CreateGameResponse createGame(CreateGameRequest createGameRequest) {
-        return null;
+    public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws IOException {
+        URL url = new URL(serverUrl + "/game");
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("POST");
+        http.setDoOutput(true);
+        http.setRequestProperty("Authorization", createGameRequest.authToken());
+
+        http.connect();
+
+        try(OutputStream body = http.getOutputStream()) {
+            byte[] input = new Gson().toJson(createGameRequest).getBytes();
+            body.write(input, 0, input.length);
+        }
+        int responseCode = http.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getInputStream(), StandardCharsets.UTF_8))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                return new Gson().fromJson(response.toString(), CreateGameResponse.class);
+            }
+        } else {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                Error error = new Gson().fromJson(response.toString(), Error.class);
+                throw new IOException("Server error: " + error.message());
+            }
+        }
     }
 
     public GameList listGames(AuthToken authToken) {
