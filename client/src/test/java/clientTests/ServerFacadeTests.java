@@ -123,11 +123,16 @@ public class ServerFacadeTests {
         });
     }
     @Test
-    public void positiveLogout() {
-
+    public void positiveLogout() throws DataAccessException, IOException {
+        userDAO.createUser(new UserData("user", "pass", "email"));
+        authDAO.createAuth(new AuthData("auth", "user"));
+        facade.logout(new AuthToken("auth"));
+        Assertions.assertNull(authDAO.getAuth("auth"));
     }
     @Test
     public void negativeLogout() {
-
+        Assertions.assertThrows(IOException.class, () -> {
+            facade.logout(new AuthToken("auth"));
+        });
     }
 }

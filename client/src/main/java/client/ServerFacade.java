@@ -183,8 +183,26 @@ public class ServerFacade {
         }
     }
 
-    public void logout(AuthToken authToken) {
+    public void logout(AuthToken authToken) throws IOException {
+        URL url = new URL(serverUrl + "/session");
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("DELETE");
+        http.setDoOutput(true);
+        http.setRequestProperty("Authorization", authToken.authToken());
 
+        http.connect();
+
+        int responseCode = http.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                Error error = new Gson().fromJson(response.toString(), Error.class);
+                throw new IOException("Server error: " + error.message());
+            }
+        }
     }
-
 }
