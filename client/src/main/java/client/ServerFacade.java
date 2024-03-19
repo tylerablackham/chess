@@ -1,42 +1,59 @@
 package client;
-
 import com.google.gson.Gson;
-import com.sun.nio.sctp.NotificationHandler;
 import model.*;
+import model.Error;
 
-import javax.websocket.ContainerProvider;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class ServerFacade {
-    Session session;
+    private String serverUrl;
 
+    public ServerFacade(int port) {
+        serverUrl = "http://localhost:" + port;
+    }
 
-    public ServerFacade(String url) throws Exception {
-        try {
-            url = url.replace("http", "ws");
-            URI socketURI = new URI(url + "/connect");
-            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-            this.session = container.connectToServer(this, socketURI);
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message){}
-            });
+    public AuthData register(UserData userData) throws IOException {
+        URL url = new URL(serverUrl + "/user");
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("POST");
+        http.setDoOutput(true);
 
-        } catch (URISyntaxException e) {
-            throw new Exception(e.getMessage());
+        http.connect();
+
+        try(OutputStream body = http.getOutputStream()) {
+            byte[] input = new Gson().toJson(userData).getBytes();
+            body.write(input, 0, input.length);
+        }
+        int responseCode = http.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getInputStream(), StandardCharsets.UTF_8))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                return new Gson().fromJson(response.toString(), AuthData.class);
+            }
+        } else {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                Error error = new Gson().fromJson(response.toString(), Error.class);
+                throw new IOException("Server error: " + error.message());
+            }
         }
     }
-
-    public String register(UserData userData){
+    public String login(LoginRequest loginRequest) {
         return "";
-    }
-    public String login(LoginRequest loginRequest){
-        return"";
     }
 
     public CreateGameResponse createGame(CreateGameRequest createGameRequest) {

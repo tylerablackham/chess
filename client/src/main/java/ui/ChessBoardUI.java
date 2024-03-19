@@ -54,8 +54,8 @@ public class ChessBoardUI {
         for (String letter : letters){
             out.print("\u2002\u2002" + letter + "\u2002");
         }
-        out.print("   \u2009");
-        out.println(EscapeSequences.RESET_BG_COLOR);
+        out.print("   \u2009\u2009");
+        out.println("\u001B[0m"); //reset background color
     }
 
     private void drawRow(ChessPiece[] row, int rowNum) {
@@ -74,8 +74,8 @@ public class ChessBoardUI {
         }
         out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        out.print(" " + (8 - rowNum) + " ");
-        out.println(EscapeSequences.RESET_BG_COLOR);
+        out.print(" \u2009" + (8 - rowNum) + " ");
+        out.println("\u001B[0m"); //reset background color
     }
 
     private void drawCell(ChessPiece piece, int rowNum, int colNum) {
