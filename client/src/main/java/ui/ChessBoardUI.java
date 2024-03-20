@@ -52,16 +52,16 @@ public class ChessBoardUI {
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         out.print("   ");
         for (String letter : letters){
-            out.print("\u2002\u2002" + letter + "\u2002");
+            out.print(" " + letter + " ");
         }
-        out.print("   \u2009\u2009");
+        out.print("   ");
         out.println("\u001B[0m"); //reset background color
     }
 
     private void drawRow(ChessPiece[] row, int rowNum) {
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
-        out.print(" " + (8 - rowNum) + " \u2009");
+        out.print(" " + (8 - rowNum) + " ");
         if (isFacingBlack) {
             for (int i = row.length - 1; i >= 0; i--){
                 drawCell(row[i], rowNum, i);
@@ -74,7 +74,7 @@ public class ChessBoardUI {
         }
         out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
         out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
-        out.print(" \u2009" + (8 - rowNum) + " ");
+        out.print(" " + (8 - rowNum) + " ");
         out.println("\u001B[0m"); //reset background color
     }
 
@@ -96,15 +96,15 @@ public class ChessBoardUI {
 
     private String returnStringRepresentation(ChessPiece piece) {
         if (piece == null) {
-            return EscapeSequences.EMPTY;
+            return "   ";
         }
         return switch (piece.getPieceType()){
-            case KING -> EscapeSequences.BLACK_KING;
-            case QUEEN -> EscapeSequences.BLACK_QUEEN;
-            case BISHOP -> EscapeSequences.BLACK_BISHOP;
-            case KNIGHT -> EscapeSequences.BLACK_KNIGHT;
-            case ROOK -> EscapeSequences.BLACK_ROOK;
-            case PAWN -> EscapeSequences.BLACK_PAWN;
+            case KING -> " K ";
+            case QUEEN -> " Q ";
+            case BISHOP -> " B ";
+            case KNIGHT -> " N ";
+            case ROOK -> " R ";
+            case PAWN -> " P ";
         };
     }
 

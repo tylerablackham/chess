@@ -12,9 +12,14 @@ public class GameService {
     GameDAO gameDAO;
     AuthDAO authDAO;
     public GameService(GameDAO gameDAO, AuthDAO authDAO){
-        gameID = 1;
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
+        gameID = 1;
+        try {
+            gameID = gameDAO.listGames().size()+1;
+        } catch(DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
     }
     public GameList listGames(AuthToken authToken) throws DataAccessException {
         try {
