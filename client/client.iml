@@ -26,5 +26,6 @@
     <orderEntry type="module" module-name="server" scope="TEST" />
     <orderEntry type="library" name="mysql.connector.java" level="project" />
     <orderEntry type="library" name="sparkjava.spark.core1" level="project" />
+    <orderEntry type="module" module-name="server" />
   </component>
 </module>

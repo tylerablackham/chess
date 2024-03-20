@@ -1,8 +1,15 @@
 package client;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import dataAccess.SQLAuthDAO;
+import dataAccess.SQLGameDAO;
+import dataAccess.SQLUserDAO;
 import model.*;
+import server.Server;
+import ui.ChessBoardUI;
 
+import java.io.IOException;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -10,6 +17,8 @@ public class Menus {
     private String authToken;
     private boolean hasNotQuit;
     Scanner scan;
+    ServerFacade serverFacade;
+    Server server;
     public static void main(String[] args){
         Menus menus = new Menus();
         menus.showMenus();
@@ -19,6 +28,10 @@ public class Menus {
         authToken = "";
         hasNotQuit = true;
         scan = new Scanner(System.in);
+        server = new Server(new SQLUserDAO(), new SQLGameDAO(), new SQLAuthDAO());
+        var port = server.run(8080);
+        System.out.println("Started test HTTP server on " + port);
+        serverFacade = new ServerFacade(port);
     }
 
     public void showMenus() {
@@ -108,10 +121,11 @@ public class Menus {
         System.out.println("Please enter your email.");
         String email = scan.nextLine();
         UserData userData = new UserData(username, password, email);
-
-        System.out.println(userData);
-
-        authToken = "auth";
+        try {
+            authToken = serverFacade.register(userData).authToken();
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void login() {
@@ -120,10 +134,11 @@ public class Menus {
         System.out.println("Please enter your password.");
         String password = scan.nextLine();
         LoginRequest loginRequest = new LoginRequest(username, password);
-
-        System.out.println(loginRequest);
-
-        authToken = "auth";
+        try {
+            authToken = serverFacade.login(loginRequest).authToken();
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void createGame() {
@@ -131,13 +146,28 @@ public class Menus {
         String gameName = scan.nextLine();
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
 
-        System.out.println(createGameRequest);
+        try {
+            CreateGameResponse response = serverFacade.createGame(createGameRequest);
+            System.out.println("Created game: " + gameName + "\n\twith game ID: " + response.gameID());
+
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void listGames() {
         AuthToken authToken1 = new AuthToken(authToken);
 
-        System.out.println(authToken1);
+        try {
+            GameList gameList = serverFacade.listGames(authToken1);
+            System.out.println("The existing games are as follows (Game Name - Game ID):\n");
+            for (GameData game : gameList.games()) {
+                System.out.println(game.gameName() + " - " + game.gameID());
+            }
+            System.out.println("\n");
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void joinGame() {
@@ -149,7 +179,16 @@ public class Menus {
             ChessGame.TeamColor playerColor = color.equals("black") ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
             JoinGameRequest joinGameRequest =  new JoinGameRequest(authToken, gameID, playerColor);
 
-            System.out.println(joinGameRequest);
+            try {
+                serverFacade.joinGame(joinGameRequest);
+                ChessBoard chessBoard = new ChessBoard();
+                chessBoard.resetBoard();
+                ChessBoardUI.draw(chessBoard, true);
+                System.out.println();
+                ChessBoardUI.draw(chessBoard, false);
+            } catch(IOException e) {
+                System.out.println(e.getMessage());
+            }
         }
         else {
             System.out.println("Unrecognized team color. Please try again.");
@@ -162,15 +201,30 @@ public class Menus {
         int gameID = Integer.parseInt(scan.nextLine().trim());
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameID, null);
 
-        System.out.println(joinGameRequest);
+        try {
+            serverFacade.joinGame(joinGameRequest);
+            ChessBoard chessBoard = new ChessBoard();
+            chessBoard.resetBoard();
+            ChessBoardUI.draw(chessBoard, true);
+            System.out.println();
+            ChessBoardUI.draw(chessBoard, false);
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void logout() {
-        authToken = "";
+        try {
+            serverFacade.logout(new AuthToken(authToken));
+            authToken = "";
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void quit() {
         hasNotQuit = false;
+        server.stop();
     }
 
     private void helpPreLogin() {
