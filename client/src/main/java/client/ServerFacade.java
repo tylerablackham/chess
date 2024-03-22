@@ -20,189 +20,36 @@ public class ServerFacade {
     }
 
     public AuthData register(UserData userData) throws IOException {
-        URL url = new URL(serverUrl + "/user");
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("POST");
-        http.setDoOutput(true);
-
-        http.connect();
-
-        try(OutputStream body = http.getOutputStream()) {
-            byte[] input = new Gson().toJson(userData).getBytes();
-            body.write(input, 0, input.length);
-        }
-        int responseCode = http.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getInputStream(), StandardCharsets.UTF_8))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                return new Gson().fromJson(response.toString(), AuthData.class);
-            }
-        } else {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                Error error = new Gson().fromJson(response.toString(), Error.class);
-                throw new IOException("Server error: " + error.message());
-            }
-        }
+        String response = HTTPCommunicator.sendRequest(serverUrl, "/user", "POST",
+                null, userData);
+        return new Gson().fromJson(response, AuthData.class);
     }
+
     public AuthData login(LoginRequest loginRequest) throws IOException {
-        URL url = new URL(serverUrl + "/session");
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("POST");
-        http.setDoOutput(true);
-
-        http.connect();
-
-        try(OutputStream body = http.getOutputStream()) {
-            byte[] input = new Gson().toJson(loginRequest).getBytes();
-            body.write(input, 0, input.length);
-        }
-        int responseCode = http.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getInputStream(), StandardCharsets.UTF_8))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                return new Gson().fromJson(response.toString(), AuthData.class);
-            }
-        } else {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                Error error = new Gson().fromJson(response.toString(), Error.class);
-                throw new IOException("Server error: " + error.message());
-            }
-        }
+        String response = HTTPCommunicator.sendRequest(serverUrl, "/session", "POST",
+                null, loginRequest);
+        return new Gson().fromJson(response, AuthData.class);
     }
 
     public CreateGameResponse createGame(CreateGameRequest createGameRequest) throws IOException {
-        URL url = new URL(serverUrl + "/game");
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("POST");
-        http.setDoOutput(true);
-        http.setRequestProperty("Authorization", createGameRequest.authToken());
-
-        http.connect();
-
-        try(OutputStream body = http.getOutputStream()) {
-            byte[] input = new Gson().toJson(createGameRequest).getBytes();
-            body.write(input, 0, input.length);
-        }
-        int responseCode = http.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getInputStream(), StandardCharsets.UTF_8))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                return new Gson().fromJson(response.toString(), CreateGameResponse.class);
-            }
-        } else {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                Error error = new Gson().fromJson(response.toString(), Error.class);
-                throw new IOException("Server error: " + error.message());
-            }
-        }
+        String response = HTTPCommunicator.sendRequest(serverUrl, "/game", "POST",
+                createGameRequest.authToken(), createGameRequest);
+        return new Gson().fromJson(response, CreateGameResponse.class);
     }
 
     public GameList listGames(AuthToken authToken) throws IOException {
-        URL url = new URL(serverUrl + "/game");
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("GET");
-        http.setDoOutput(true);
-        http.setRequestProperty("Authorization", authToken.authToken());
-
-        http.connect();
-
-        int responseCode = http.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getInputStream(), StandardCharsets.UTF_8))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                return new Gson().fromJson(response.toString(), GameList.class);
-            }
-        } else {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                Error error = new Gson().fromJson(response.toString(), Error.class);
-                throw new IOException("Server error: " + error.message());
-            }
-        }
+        String response = HTTPCommunicator.sendRequest(serverUrl, "/game", "GET",
+                authToken.authToken(), null);
+        return new Gson().fromJson(response, GameList.class);
     }
 
     public void joinGame(JoinGameRequest joinGameRequest) throws IOException {
-        URL url = new URL(serverUrl + "/game");
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("PUT");
-        http.setDoOutput(true);
-        http.setRequestProperty("Authorization", joinGameRequest.authToken());
-
-        http.connect();
-
-        try(OutputStream body = http.getOutputStream()) {
-            byte[] input = new Gson().toJson(joinGameRequest).getBytes();
-            body.write(input, 0, input.length);
-        }
-        int responseCode = http.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                Error error = new Gson().fromJson(response.toString(), Error.class);
-                throw new IOException("Server error: " + error.message());
-            }
-        }
+        HTTPCommunicator.sendRequest(serverUrl, "/game", "PUT",
+                joinGameRequest.authToken(), joinGameRequest);
     }
 
     public void logout(AuthToken authToken) throws IOException {
-        URL url = new URL(serverUrl + "/session");
-        HttpURLConnection http = (HttpURLConnection) url.openConnection();
-        http.setRequestMethod("DELETE");
-        http.setDoOutput(true);
-        http.setRequestProperty("Authorization", authToken.authToken());
-
-        http.connect();
-
-        int responseCode = http.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(http.getErrorStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                Error error = new Gson().fromJson(response.toString(), Error.class);
-                throw new IOException("Server error: " + error.message());
-            }
-        }
+        HTTPCommunicator.sendRequest(serverUrl, "/session", "DELETE",
+                authToken.authToken(), null);
     }
 }
