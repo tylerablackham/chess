@@ -183,9 +183,9 @@ public class Menus {
                 serverFacade.joinGame(joinGameRequest);
                 ChessBoard chessBoard = new ChessBoard();
                 chessBoard.resetBoard();
-                ChessBoardUI.draw(chessBoard, true, null, null);
                 System.out.println();
-                ChessBoardUI.draw(chessBoard, false, null, null);
+                ChessBoardUI.draw(chessBoard, (playerColor ==  ChessGame.TeamColor.BLACK), null, null);
+                System.out.println();
             } catch(IOException e) {
                 System.out.println(e.getMessage());
             }
