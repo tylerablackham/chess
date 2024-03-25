@@ -191,4 +191,13 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    public boolean[][] getMoveMatrix(Collection<ChessMove> chessMoves) {
+        boolean[][] moveMatrix = new boolean[8][8];
+        for (ChessMove move: chessMoves){
+            ChessPosition position = move.getEndPosition();
+            moveMatrix[position.getRow()-1][position.getColumn()-1] = true;
+        }
+        return moveMatrix;
+    }
 }

@@ -61,24 +61,24 @@ public class ChessBoard {
             board[7-1][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
             board[2-1][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             if (i == 1 || i == 8){
-                board[8-1][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-                board[1-1][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+                board[7][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+                board[0][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
             }
             if (i == 2 || i == 7){
-                board[8-1][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
-                board[1-1][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+                board[7][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+                board[0][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
             }
             if (i == 3 || i == 6){
-                board[8-1][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
-                board[1-1][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+                board[7][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+                board[0][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
             }
             if (i == 4){
-                board[8-1][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
-                board[1-1][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+                board[7][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+                board[0][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
             }
             if (i == 5){
-                board[8-1][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
-                board[1-1][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+                board[7][i-1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+                board[0][i-1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
             }
         }
     }

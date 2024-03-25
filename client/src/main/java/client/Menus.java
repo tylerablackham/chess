@@ -183,9 +183,9 @@ public class Menus {
                 serverFacade.joinGame(joinGameRequest);
                 ChessBoard chessBoard = new ChessBoard();
                 chessBoard.resetBoard();
-                ChessBoardUI.draw(chessBoard, true);
+                ChessBoardUI.draw(chessBoard, true, null, null);
                 System.out.println();
-                ChessBoardUI.draw(chessBoard, false);
+                ChessBoardUI.draw(chessBoard, false, null, null);
             } catch(IOException e) {
                 System.out.println(e.getMessage());
             }
@@ -205,9 +205,9 @@ public class Menus {
             serverFacade.joinGame(joinGameRequest);
             ChessBoard chessBoard = new ChessBoard();
             chessBoard.resetBoard();
-            ChessBoardUI.draw(chessBoard, true);
+            ChessBoardUI.draw(chessBoard, true, null, null);
             System.out.println();
-            ChessBoardUI.draw(chessBoard, false);
+            ChessBoardUI.draw(chessBoard, false, null, null);
         } catch(IOException e) {
             System.out.println(e.getMessage());
         }
