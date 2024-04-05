@@ -1,5 +1,7 @@
 package webSocketMessages.userCommands;
 
+import com.google.gson.Gson;
+
 import java.util.Objects;
 
 /**
@@ -47,5 +49,9 @@ public class UserGameCommand {
     @Override
     public int hashCode() {
         return Objects.hash(getCommandType(), getAuthString());
+    }
+
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }
