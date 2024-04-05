@@ -1,8 +1,52 @@
 import chess.*;
+import client.Menus;
+import com.google.gson.*;
+import webSocketMessages.serverMessages.Error;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
+import webSocketMessages.userCommands.*;
+
+import java.lang.reflect.Type;
 
 public class Main {
     public static void main(String[] args) {
-        var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-        System.out.println("♕ 240 Chess Client: " + piece);
+        GsonBuilder builder = new GsonBuilder();
+        builder.registerTypeAdapter(ServerMessage.class, new serverMessageDeserializer());
+        builder.registerTypeAdapter(UserGameCommand.class, new userCommandDeserializer());
+        Menus.main(args);
+    }
+    private static class serverMessageDeserializer implements JsonDeserializer<ServerMessage> {
+        @Override
+        public ServerMessage deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+            String typeString = jsonObject.get("ServerMessageType").getAsString();
+            ServerMessage.ServerMessageType serverMessageType = ServerMessage.ServerMessageType.valueOf(typeString);
+
+            return switch (serverMessageType) {
+                case LOAD_GAME -> context.deserialize(jsonElement, LoadGame.class);
+                case ERROR -> context.deserialize(jsonElement, Error.class);
+                case NOTIFICATION -> context.deserialize(jsonElement, Notification.class);
+            };
+        }
+    }
+
+    private static class userCommandDeserializer implements JsonDeserializer<UserGameCommand> {
+        @Override
+        public UserGameCommand deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+
+            String typeString = jsonObject.get("CommandType").getAsString();
+            UserGameCommand.CommandType commandType = UserGameCommand.CommandType.valueOf(typeString);
+
+            return switch (commandType) {
+                case JOIN_PLAYER -> context.deserialize(jsonElement, JoinPlayer.class);
+                case JOIN_OBSERVER -> context.deserialize(jsonElement, JoinObserver.class);
+                case MAKE_MOVE -> context.deserialize(jsonElement, MakeMove.class);
+                case LEAVE -> context.deserialize(jsonElement, Leave.class);
+                case RESIGN -> context.deserialize(jsonElement, Resign.class);
+            };
+        }
     }
 }
