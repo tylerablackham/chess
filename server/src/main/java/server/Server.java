@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import dataAccess.*;
 import model.*;
 import model.Error;
+import server.websocket.WebSocketHandler;
 import service.DatabaseService;
 import service.GameService;
 import service.UserService;
@@ -16,6 +17,8 @@ public class Server {
     private final DatabaseService databaseService;
     private final GameService gameService;
     private final UserService userService;
+    private final WebSocketHandler webSocketHandler;
+
     public static void main(String[] args) {
         new Server().run(8080);
     }
@@ -24,6 +27,7 @@ public class Server {
         databaseService = new DatabaseService(userDAO, gameDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);
         userService = new UserService(userDAO, authDAO);
+        webSocketHandler = new WebSocketHandler();
     }
 
     public Server() {
@@ -35,6 +39,8 @@ public class Server {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
+
+        Spark.webSocket("/connect", webSocketHandler);
 
         // Register your endpoints and handle exceptions here.
         Spark.delete("/db", this::clear);
@@ -121,7 +127,7 @@ public class Server {
     private Object createGame(Request req, Response res) {
         CreateGameRequest createGameRequest = new Gson().fromJson(req.body(), CreateGameRequest.class);
         createGameRequest = new CreateGameRequest(req.headers("authorization"), createGameRequest.gameName());
-        if (createGameRequest.gameName() == null || createGameRequest.authToken() == null){
+        if (createGameRequest.gameName() == null || createGameRequest.authToken() == null) {
             res.status(400);
             return new Gson().toJson(new Error("Error: bad request"));
         }
