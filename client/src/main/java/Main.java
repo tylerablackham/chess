@@ -12,16 +12,16 @@ import java.lang.reflect.Type;
 public class Main {
     public static void main(String[] args) {
         GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(ServerMessage.class, new serverMessageDeserializer());
-        builder.registerTypeAdapter(UserGameCommand.class, new userCommandDeserializer());
+        builder.registerTypeAdapter(ServerMessage.class, new ServerMessageDeserializer());
+        builder.registerTypeAdapter(UserGameCommand.class, new UserCommandDeserializer());
         Menus.main(args);
     }
-    private static class serverMessageDeserializer implements JsonDeserializer<ServerMessage> {
+    private static class ServerMessageDeserializer implements JsonDeserializer<ServerMessage> {
         @Override
         public ServerMessage deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-            String typeString = jsonObject.get("ServerMessageType").getAsString();
+            String typeString = jsonObject.get("serverMessageType").getAsString();
             ServerMessage.ServerMessageType serverMessageType = ServerMessage.ServerMessageType.valueOf(typeString);
 
             return switch (serverMessageType) {
@@ -32,12 +32,12 @@ public class Main {
         }
     }
 
-    private static class userCommandDeserializer implements JsonDeserializer<UserGameCommand> {
+    private static class UserCommandDeserializer implements JsonDeserializer<UserGameCommand> {
         @Override
         public UserGameCommand deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) throws JsonParseException {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
 
-            String typeString = jsonObject.get("CommandType").getAsString();
+            String typeString = jsonObject.get("commandType").getAsString();
             UserGameCommand.CommandType commandType = UserGameCommand.CommandType.valueOf(typeString);
 
             return switch (commandType) {
