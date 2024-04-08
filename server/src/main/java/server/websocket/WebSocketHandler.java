@@ -9,7 +9,6 @@ import dataAccess.DataAccessException;
 import dataAccess.SQLAuthDAO;
 import dataAccess.SQLGameDAO;
 import model.AuthData;
-import model.AuthToken;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -70,12 +69,12 @@ public class WebSocketHandler {
     private void joinObserver (Session session, JoinObserver joinObserver) throws IOException, DataAccessException {
         AuthData auth = authDAO.getAuth(joinObserver.getAuthString());
         if (auth == null) {
-            sendError(session, new Error("Error: bad auth token"));
+            sendError(session, new Error("Error: bad authToken"));
             return;
         }
         GameData gameData = gameDAO.getGame(joinObserver.getGameID());
         if (gameData == null) {
-            sendError(session, new Error("Error: bad game ID"));
+            sendError(session, new Error("Error: bad gameID"));
             return;
         }
         String name = auth.username();
