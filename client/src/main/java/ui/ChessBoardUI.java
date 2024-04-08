@@ -17,6 +17,7 @@ public class ChessBoardUI {
         ChessBoard chessBoard = chessGame.getBoard();
         ChessPosition highlighted = new ChessPosition(7,4);
         boolean[][] highlights = chessGame.getMoveMatrix(chessGame.validMoves(highlighted));
+        System.out.println(ChessGame.getMoveString(highlighted));
         draw(chessBoard, true, highlights, highlighted);
         System.out.println();
         draw(chessBoard, false, highlights, highlighted);

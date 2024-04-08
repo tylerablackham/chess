@@ -8,17 +8,24 @@ import dataAccess.SQLUserDAO;
 import model.*;
 import server.Server;
 import ui.ChessBoardUI;
+import webSocketMessages.serverMessages.Error;
+import webSocketMessages.serverMessages.LoadGame;
+import webSocketMessages.serverMessages.Notification;
+import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Scanner;
 
-public class Menus {
+public class Menus implements ServerMessageObserver {
     private String authToken;
     private boolean hasNotQuit;
+    private boolean isFacingBlack;
     Scanner scan;
     ServerFacade serverFacade;
     Server server;
+
     public static void main(String[] args){
         Menus menus = new Menus();
         menus.showMenus();
@@ -178,14 +185,9 @@ public class Menus {
         if (color.equals("black") || color.equals("white")){
             ChessGame.TeamColor playerColor = color.equals("black") ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
             JoinGameRequest joinGameRequest =  new JoinGameRequest(authToken, gameID, playerColor);
-
             try {
                 serverFacade.joinGame(joinGameRequest);
-                ChessBoard chessBoard = new ChessBoard();
-                chessBoard.resetBoard();
-                System.out.println();
-                ChessBoardUI.draw(chessBoard, (playerColor ==  ChessGame.TeamColor.BLACK), null, null);
-                System.out.println();
+                this.isFacingBlack = playerColor == ChessGame.TeamColor.BLACK;
             } catch(IOException e) {
                 System.out.println(e.getMessage());
             }
@@ -200,14 +202,9 @@ public class Menus {
         System.out.println("Enter the ID number for the game you would like to observe.");
         int gameID = Integer.parseInt(scan.nextLine().trim());
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameID, null);
-
         try {
             serverFacade.joinGame(joinGameRequest);
-            ChessBoard chessBoard = new ChessBoard();
-            chessBoard.resetBoard();
-            ChessBoardUI.draw(chessBoard, true, null, null);
-            System.out.println();
-            ChessBoardUI.draw(chessBoard, false, null, null);
+            this.isFacingBlack = false;
         } catch(IOException e) {
             System.out.println(e.getMessage());
         }
@@ -251,4 +248,23 @@ public class Menus {
                 """);
         scan.nextLine();
     }
+
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> {
+                Notification notification = (Notification) message;
+                System.out.println(notification.getMessage());
+            }
+            case ERROR -> {
+                Error error = (Error) message;
+                System.out.println(error.getErrorMessage());
+            }
+            case LOAD_GAME -> {
+                LoadGame loadGame = (LoadGame) message;
+                System.out.println();
+                ChessBoardUI.draw(loadGame.getGame().getBoard(), isFacingBlack, null, null);
+            }
+        }
+    }
+
 }

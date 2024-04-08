@@ -13,11 +13,13 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor turn;
+    public boolean over;
 
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
         turn = TeamColor.WHITE;
+        over = false;
     }
 
     /**
@@ -79,8 +81,11 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (over) {
+            throw new InvalidMoveException("The game is over");
+        }
         if(board.getPiece(move.getStartPosition()).getTeamColor() != turn){
-            throw new InvalidMoveException("It is not this team's turn!");
+            throw new InvalidMoveException("It is not your team's turn!");
         }
         if(validMoves(move.getStartPosition()).contains(move)){
             movePiece(move);
@@ -199,5 +204,11 @@ public class ChessGame {
             moveMatrix[position.getRow()-1][position.getColumn()-1] = true;
         }
         return moveMatrix;
+    }
+
+    public static String getMoveString(ChessPosition position) {
+        String[] letters = {"A", "B", "C", "D", "E", "F", "G", "H"};
+        String[] numbers = {"1", "2", "3", "4", "5", "6", "7", "8"};
+        return numbers[position.getRow() - 1] + letters[position.getColumn() - 1];
     }
 }

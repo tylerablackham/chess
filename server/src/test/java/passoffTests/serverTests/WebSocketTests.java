@@ -1,4 +1,4 @@
-package serverTests;
+package passoffTests.serverTests;
 
 import chess.ChessGame;
 import chess.ChessMove;
