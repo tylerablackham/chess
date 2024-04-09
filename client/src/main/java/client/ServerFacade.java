@@ -1,22 +1,21 @@
 package client;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import model.*;
-import model.Error;
+import webSocketMessages.userCommands.JoinObserver;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 public class ServerFacade {
     private String serverUrl;
+    private WebSocketCommunicator webSocketCommunicator;
 
     public ServerFacade(int port) {
         serverUrl = "http://localhost:" + port;
+    }
+
+    public void addObserver(ServerMessageObserver serverMessageObserver) throws Exception {
+        webSocketCommunicator = new WebSocketCommunicator(serverUrl, serverMessageObserver);
     }
 
     public AuthData register(UserData userData) throws IOException {
@@ -48,8 +47,28 @@ public class ServerFacade {
                 joinGameRequest.authToken(), joinGameRequest);
     }
 
+    public void joinPlayer(JoinGameRequest joinGameRequest) throws IOException {
+        webSocketCommunicator.joinPlayer(joinGameRequest);
+    }
+
+    public void joinObserver(JoinGameRequest joinGameRequest) throws IOException{
+        webSocketCommunicator.joinObserver(joinGameRequest);
+    }
+
     public void logout(AuthToken authToken) throws IOException {
         HTTPCommunicator.sendRequest(serverUrl, "/session", "DELETE",
                 authToken.authToken(), null);
+    }
+
+    public void makeMove(AuthToken authToken, int gameID, ChessMove move) throws IOException {
+        webSocketCommunicator.makeMove(authToken, gameID, move);
+    }
+
+    public void resign(AuthToken authToken, int gameID) throws IOException {
+        webSocketCommunicator.resign(authToken, gameID);
+    }
+
+    public void leave(AuthToken authToken, int gameID) throws IOException {
+        webSocketCommunicator.leave(authToken, gameID);
     }
 }

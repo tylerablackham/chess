@@ -95,7 +95,10 @@ public class WebSocketHandler {
                 connections.getByGameAndColor(makeMove.getGameID(), ChessGame.TeamColor.BLACK);
         try {
             if (!Objects.equals(makeMove.getAuthString(), currentTurn)) {
-                throw new InvalidMoveException("It is not your turn.");
+                throw new InvalidMoveException("These are not your pieces.");
+            }
+            if (game.getBoard().getPiece(move.getStartPosition()) == null){
+                throw new InvalidMoveException("There is no piece here.");
             }
             game.makeMove(move);
             gameDAO.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(),
@@ -104,6 +107,7 @@ public class WebSocketHandler {
                     " to " + ChessGame.getMoveString(move.getEndPosition()) + ".\n");
             connections.broadcast(null, makeMove.getGameID(), new LoadGame(game), null);
             connections.broadcast(makeMove.getAuthString(), makeMove.getGameID(), notification, null);
+            checkGameEnd(gameData, name);
         } catch (InvalidMoveException e) {
             sendError(session, new Error("Error: " + e.getMessage()));
         }
@@ -147,5 +151,28 @@ public class WebSocketHandler {
 
     private void sendError(Session session, Error error) throws IOException, DataAccessException {
         session.getRemote().sendString(error.toString());
+    }
+
+    private void checkGameEnd(GameData gameData, String name) throws IOException, DataAccessException {
+        ChessGame.TeamColor color = gameData.game().getTeamTurn();
+        if (gameData.game().isInCheckmate(color)) {
+            gameData.game().over = true;
+            String loser = color == ChessGame.TeamColor.WHITE ? gameData.whiteUsername() : gameData.blackUsername();
+            Notification notification = new Notification(loser + " is in checkmate. " + name + " wins!\n");
+            connections.broadcast(null, gameData.gameID(), notification, null);
+            gameDAO.updateGame(gameData);
+        }
+        else if (gameData.game().isInStalemate(color)) {
+            gameData.game().over = true;
+            String loser = color == ChessGame.TeamColor.WHITE ? gameData.whiteUsername() : gameData.blackUsername();
+            Notification notification = new Notification(loser + " is in stalemate. " + name + " wins!\n");
+            connections.broadcast(null, gameData.gameID(), notification, null);
+            gameDAO.updateGame(gameData);
+        }
+        else if (gameData.game().isInCheck(color)) {
+            String loser = color == ChessGame.TeamColor.WHITE ? gameData.whiteUsername() : gameData.blackUsername();
+            Notification notification = new Notification(loser + " is in check.\n");
+            connections.broadcast(null, gameData.gameID(), notification, null);
+        }
     }
 }

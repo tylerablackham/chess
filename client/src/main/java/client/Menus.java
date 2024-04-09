@@ -1,6 +1,10 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
+import com.google.gson.Gson;
 import model.*;
 import ui.ChessBoardUI;
 import webSocketMessages.serverMessages.Error;
@@ -9,6 +13,7 @@ import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -16,10 +21,13 @@ public class Menus implements ServerMessageObserver {
     private String authToken;
     private boolean hasNotQuit;
     private boolean isFacingBlack;
+    private boolean inGame;
+    private int gameID;
+    private ChessGame chessGame;
     Scanner scan;
     ServerFacade serverFacade;
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Menus menus = new Menus();
         menus.showMenus();
     }
@@ -27,6 +35,7 @@ public class Menus implements ServerMessageObserver {
     public Menus() {
         authToken = "";
         hasNotQuit = true;
+        inGame = false;
         scan = new Scanner(System.in);
         serverFacade = new ServerFacade(8080);
     }
@@ -37,7 +46,12 @@ public class Menus implements ServerMessageObserver {
                 loggedOutMenu();
             }
             else {
-                loggedInMenu();
+                if (inGame) {
+                    inGameMenu();
+                }
+                else {
+                    loggedInMenu();
+                }
             }
         }
     }
@@ -110,6 +124,34 @@ public class Menus implements ServerMessageObserver {
         }
     }
 
+    private void inGameMenu() {
+        System.out.println("""
+                 You are currently in a game. Type 'help' for a list of commands:
+                """);
+        String in = scan.nextLine().toLowerCase().trim();
+        switch (in){
+            case "draw":
+                draw();
+                break;
+            case "highlight":
+                highlight();
+                break;
+            case "move":
+                move();
+                break;
+            case "resign":
+                resign();
+                break;
+            case "leave":
+                leaveGame();
+                break;
+            case "help":
+                helpInGame();
+                break;
+            default: System.out.println(in + " is not recognized. Please try again\n");
+        }
+    }
+
     private void register() {
         System.out.println("Please enter a username.");
         String username = scan.nextLine();
@@ -176,9 +218,14 @@ public class Menus implements ServerMessageObserver {
             ChessGame.TeamColor playerColor = color.equals("black") ? ChessGame.TeamColor.BLACK : ChessGame.TeamColor.WHITE;
             JoinGameRequest joinGameRequest =  new JoinGameRequest(authToken, gameID, playerColor);
             try {
+                serverFacade.addObserver(this);
                 serverFacade.joinGame(joinGameRequest);
+                serverFacade.joinPlayer(joinGameRequest);
                 this.isFacingBlack = playerColor == ChessGame.TeamColor.BLACK;
-            } catch(IOException e) {
+                inGame = true;
+                chessGame = new ChessGame();
+                this.gameID = gameID;
+            } catch(Exception e) {
                 System.out.println(e.getMessage());
             }
         }
@@ -193,9 +240,13 @@ public class Menus implements ServerMessageObserver {
         int gameID = Integer.parseInt(scan.nextLine().trim());
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, gameID, null);
         try {
+            serverFacade.addObserver(this);
             serverFacade.joinGame(joinGameRequest);
+            serverFacade.joinObserver(joinGameRequest);
             this.isFacingBlack = false;
-        } catch(IOException e) {
+            inGame = true;
+            this.gameID = gameID;
+        } catch(Exception e) {
             System.out.println(e.getMessage());
         }
     }
@@ -204,6 +255,66 @@ public class Menus implements ServerMessageObserver {
         try {
             serverFacade.logout(new AuthToken(authToken));
             authToken = "";
+            inGame = false;
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void draw() {
+        ChessBoardUI.draw(chessGame.getBoard(), isFacingBlack, null, null);
+    }
+
+    private void highlight() {
+        System.out.println("Enter the column and row of the piece you would like to highlight, like so: A1.");
+        String coordinate = scan.nextLine().trim().toUpperCase();
+        int col = coordinate.charAt(0) - 'A' + 1;
+        int row = Integer.parseInt(coordinate.substring(1,2));
+        ChessPosition position = new ChessPosition(row, col);
+        Collection<ChessMove> chessMoves = chessGame.validMoves(position);
+        boolean [][] moveMatrix = chessGame.getMoveMatrix(chessMoves);
+        ChessBoardUI.draw(chessGame.getBoard(), isFacingBlack, moveMatrix, position);
+    }
+
+    private void move() {
+        System.out.println("Enter the column and row of the piece you would like to move, like so: A1.");
+        String coordinate = scan.nextLine().trim().toUpperCase();
+        int col = coordinate.charAt(0) - 'A' + 1;
+        int row = Integer.parseInt(coordinate.substring(1,2));
+        ChessPosition start = new ChessPosition(row, col);
+        System.out.println("Enter the column and row where you would like to move to, like so: A1.");
+        coordinate = scan.nextLine().trim().toUpperCase();
+        col = coordinate.charAt(0) - 'A' + 1;
+        row = Integer.parseInt(coordinate.substring(1,2));
+        ChessPosition end = new ChessPosition(row, col);
+        System.out.println("If promoting a pawn, enter the piece you would like to promote. You cannot choose pawn or king. " +
+                "If not promoting, hit enter.");
+        String piece = scan.nextLine().trim().toUpperCase();
+        ChessPiece.PieceType pieceType = new Gson().fromJson(piece, ChessPiece.PieceType.class);
+        try {
+            serverFacade.makeMove(new AuthToken(authToken), gameID, new ChessMove(start, end, pieceType));
+        } catch(IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void resign() {
+        System.out.println("Are you sure you want to resign? Your opponent will win. (Y/N)");
+        String answer = scan.nextLine().trim().toUpperCase();
+        if (answer.equals("Y") || answer.equals("YES")) {
+            try {
+                serverFacade.resign(new AuthToken(authToken), gameID);
+            } catch(IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void leaveGame() {
+        try {
+            serverFacade.leave(new AuthToken(authToken), gameID);
+            inGame = false;
+            gameID = 0;
         } catch(IOException e) {
             System.out.println(e.getMessage());
         }
@@ -238,20 +349,36 @@ public class Menus implements ServerMessageObserver {
         scan.nextLine();
     }
 
-    public void notify(ServerMessage message) {
+    private void helpInGame() {
+        System.out.println("""
+                Here are the options of what you can do during the game
+                
+                Redraw Chess Board: Type 'draw' to redraw the chess board.
+                Highlight Legal Moves: Type 'highlight' to highlight the legal moves of a piece
+                Make Move: Type 'move' to make a move. (Players only)
+                Resign: Type 'resign' to forfeit the game. (Players only)
+                Leave: Type 'leave' to leave the game.
+                
+                Press enter to continue.
+                """);
+        scan.nextLine();
+    }
+
+    public void notify(ServerMessage message, String json) {
         switch (message.getServerMessageType()) {
             case NOTIFICATION -> {
-                Notification notification = (Notification) message;
+                Notification notification = new Gson().fromJson(json, Notification.class);
                 System.out.println(notification.getMessage());
             }
             case ERROR -> {
-                Error error = (Error) message;
+                Error error = new Gson().fromJson(json, Error.class);
                 System.out.println(error.getErrorMessage());
             }
             case LOAD_GAME -> {
-                LoadGame loadGame = (LoadGame) message;
+                LoadGame loadGame = new Gson().fromJson(json, LoadGame.class);
                 System.out.println();
-                ChessBoardUI.draw(loadGame.getGame().getBoard(), isFacingBlack, null, null);
+                chessGame = loadGame.getGame();
+                ChessBoardUI.draw(chessGame.getBoard(), isFacingBlack, null, null);
             }
         }
     }
