@@ -1,10 +1,6 @@
 package client;
 
-import chess.ChessBoard;
 import chess.ChessGame;
-import dataAccess.SQLAuthDAO;
-import dataAccess.SQLGameDAO;
-import dataAccess.SQLUserDAO;
 import model.*;
 import server.Server;
 import ui.ChessBoardUI;
@@ -14,7 +10,6 @@ import webSocketMessages.serverMessages.Notification;
 import webSocketMessages.serverMessages.ServerMessage;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -35,7 +30,7 @@ public class Menus implements ServerMessageObserver {
         authToken = "";
         hasNotQuit = true;
         scan = new Scanner(System.in);
-        server = new Server(new SQLUserDAO(), new SQLGameDAO(), new SQLAuthDAO());
+        server = new Server();
         var port = server.run(8080);
         System.out.println("Started test HTTP server on " + port);
         serverFacade = new ServerFacade(port);
