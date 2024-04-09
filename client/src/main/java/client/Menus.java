@@ -2,7 +2,6 @@ package client;
 
 import chess.ChessGame;
 import model.*;
-import server.Server;
 import ui.ChessBoardUI;
 import webSocketMessages.serverMessages.Error;
 import webSocketMessages.serverMessages.LoadGame;
@@ -19,7 +18,6 @@ public class Menus implements ServerMessageObserver {
     private boolean isFacingBlack;
     Scanner scan;
     ServerFacade serverFacade;
-    Server server;
 
     public static void main(String[] args){
         Menus menus = new Menus();
@@ -30,10 +28,7 @@ public class Menus implements ServerMessageObserver {
         authToken = "";
         hasNotQuit = true;
         scan = new Scanner(System.in);
-        server = new Server();
-        var port = server.run(8080);
-        System.out.println("Started test HTTP server on " + port);
-        serverFacade = new ServerFacade(port);
+        serverFacade = new ServerFacade(8080);
     }
 
     public void showMenus() {
@@ -216,7 +211,6 @@ public class Menus implements ServerMessageObserver {
 
     private void quit() {
         hasNotQuit = false;
-        server.stop();
     }
 
     private void helpPreLogin() {
