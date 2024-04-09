@@ -85,7 +85,7 @@ public class ChessGame {
             throw new InvalidMoveException("The game is over");
         }
         if(board.getPiece(move.getStartPosition()).getTeamColor() != turn){
-            throw new InvalidMoveException("It is not your team's turn!");
+            throw new InvalidMoveException("You can only move your pieces on your turn.");
         }
         if(validMoves(move.getStartPosition()).contains(move)){
             movePiece(move);

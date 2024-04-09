@@ -125,9 +125,7 @@ public class Menus implements ServerMessageObserver {
     }
 
     private void inGameMenu() {
-        System.out.println("""
-                 You are currently in a game. Type 'help' for a list of commands:
-                """);
+        System.out.println("You are currently in a game. Type 'help' for a list of commands.");
         String in = scan.nextLine().toLowerCase().trim();
         switch (in){
             case "draw":

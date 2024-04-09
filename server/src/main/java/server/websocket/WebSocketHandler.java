@@ -95,7 +95,7 @@ public class WebSocketHandler {
                 connections.getByGameAndColor(makeMove.getGameID(), ChessGame.TeamColor.BLACK);
         try {
             if (!Objects.equals(makeMove.getAuthString(), currentTurn)) {
-                throw new InvalidMoveException("These are not your pieces.");
+                throw new InvalidMoveException("You can only move your pieces on your turn.");
             }
             if (game.getBoard().getPiece(move.getStartPosition()) == null){
                 throw new InvalidMoveException("There is no piece here.");
